@@ -1,0 +1,21 @@
+translation: avango.gua.make_trans_mat(x, y, z) 
+scaling:     avango.gua.make_scale_mat(x, y, z) 
+rotation:    avango.gua.make_rot_mat(angle, x, y, z) 
+
+dependency Graph
+
+ -> Creating a guacamole scenegraph and display it.
+     (tips 1 to 3)
+  -> Loading 3D-models and add them to the scenegraph.
+     (tips 6 to 8)
+  -> Adding lights to your scene.
+     (tip 9)
+  -> Translating, scaling and rotating objects.
+     (tips 10 to 15)
+  -> Grouping objects in the scene and manipulating them as a whole.
+     (tips 16 to 20)
+  -> Changing a geometry's material.
+     (tip 21)
+  -> Using field connections to describe dependency graphs.
+     (tips 22 to 27)
+
