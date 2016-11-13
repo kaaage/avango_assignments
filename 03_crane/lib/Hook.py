@@ -35,7 +35,11 @@ class Hook(avango.script.Script):
         
         ## ToDo: init hook node(s)
         # ...
+        self.hook_geometry = _loader.create_geometry_from_file("hook_geometry", "data/objects/sphere.obj", avango.gua.LoaderFlags.DEFAULTS)
+        self.hook_geometry.Transform.value = avango.gua.make_scale_mat(SIZE)
+        self.hook_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(0.0, 125.0, 0.0, 1.0))
 
+        PARENT_NODE.Children.value.append(self.hook_geometry)
 
         ## ToDo: init field connections
         # ...

@@ -34,6 +34,7 @@ class Hinge(avango.script.Script):
         ROT_OFFSET_MAT = avango.gua.make_identity_mat(), # the rotation offset relative to the parent coordinate system
         ROT_AXIS = avango.gua.Vec3(0,1,0), # the axis to rotate arround with the rotation input (default is head axis)
         ROT_CONSTRAINT = [-45.0, 45.0], # intervall with min and max rotation of this hinge
+        TRANS_OFFSET = 0.0
         ):
 
 
@@ -53,7 +54,25 @@ class Hinge(avango.script.Script):
 
         ## ToDo: init hinge node(s)
         # ...
+        self.hinge_transform = avango.gua.nodes.TransformNode(Name = "hinge_transform")
+        # self.hinge_transform.Transform.connect_from(self.input.sf_rot_value0)
 
+        self.hinge_geometry = _loader.create_geometry_from_file("hinge_geometry", "data/objects/cylinder.obj", avango.gua.LoaderFlags.DEFAULTS)
+        # self.hinge_geometry.Transform.value = avango.gua.make_trans_mat(0.0, TRANS_OFFSET * 5, 0.0) * ROT_OFFSET_MAT * avango.gua.make_scale_mat(DIAMETER, HEIGHT, DIAMETER)
+        self.hinge_geometry.Transform.value = avango.gua.make_trans_mat(0.0, TRANS_OFFSET * 5, 0.0) * ROT_OFFSET_MAT * avango.gua.make_scale_mat(DIAMETER, HEIGHT, DIAMETER)
+        # print(avango.gua.make_trans_mat(0.0, TRANS_OFFSET / 2, 0.0), ROT_OFFSET_MAT, avango.gua.make_scale_mat(DIAMETER, HEIGHT, DIAMETER))
+        self.hinge_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(125.0, 0.0, 0.0, 1.0))
+        # self.hinge_geometry.Material.value.EnableBackfaceCulling.value = False
+        # self.hinge_geometry.Material.value.set_uniform("Emissivity", 1.0) # no shading --> render color
+        self.hinge_transform.Children.value.append(self.hinge_geometry)
+
+        PARENT_NODE.Children.value.append(self.hinge_transform)
+        # _node = PARENT_NODE.get_arm_node()
+        # _node.Children.value.append(self.hinge_transform)
+
+
+    def get_hinge_transform_node(self):
+        return self.hinge_transform
         
     ### callback functions ###
     
@@ -62,5 +81,3 @@ class Hinge(avango.script.Script):
         pass
         ## ToDo: accumulate input to hinge node && consider rotation contraints of this hinge
         # ...
-        
-        
