@@ -44,6 +44,7 @@ class Hinge(avango.script.Script):
 
         ### parameters ###        
         self.rot_axis = ROT_AXIS
+        self.rot_angle = 0.0
         
         self.rot_constraint = ROT_CONSTRAINT
 
@@ -58,12 +59,13 @@ class Hinge(avango.script.Script):
         # self.hinge_transform.Transform.connect_from(self.input.sf_rot_value0)
 
         self.hinge_geometry = _loader.create_geometry_from_file("hinge_geometry", "data/objects/cylinder.obj", avango.gua.LoaderFlags.DEFAULTS)
-        # self.hinge_geometry.Transform.value = avango.gua.make_trans_mat(0.0, TRANS_OFFSET * 5, 0.0) * ROT_OFFSET_MAT * avango.gua.make_scale_mat(DIAMETER, HEIGHT, DIAMETER)
-        self.hinge_geometry.Transform.value = avango.gua.make_trans_mat(0.0, TRANS_OFFSET * 5, 0.0) * ROT_OFFSET_MAT * avango.gua.make_scale_mat(DIAMETER, HEIGHT, DIAMETER)
+        # self.hinge_geometry.Transform.value = avango.gua.make_trans_mat(0.0, TRANS_OFFSET, 0.0) * ROT_OFFSET_MAT * avango.gua.make_scale_mat(DIAMETER, HEIGHT, DIAMETER)
+        self.hinge_geometry.Transform.value = ROT_OFFSET_MAT * avango.gua.make_scale_mat(DIAMETER, HEIGHT, DIAMETER)
         # print(avango.gua.make_trans_mat(0.0, TRANS_OFFSET / 2, 0.0), ROT_OFFSET_MAT, avango.gua.make_scale_mat(DIAMETER, HEIGHT, DIAMETER))
-        self.hinge_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(125.0, 0.0, 0.0, 1.0))
+        self.hinge_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(1.0, 0.0, 0.0, 1.0))
         # self.hinge_geometry.Material.value.EnableBackfaceCulling.value = False
         # self.hinge_geometry.Material.value.set_uniform("Emissivity", 1.0) # no shading --> render color
+        self.hinge_transform.Transform.value = avango.gua.make_trans_mat(0.0, TRANS_OFFSET, 0.0)
         self.hinge_transform.Children.value.append(self.hinge_geometry)
 
         PARENT_NODE.Children.value.append(self.hinge_transform)
@@ -80,4 +82,6 @@ class Hinge(avango.script.Script):
     def sf_rot_value_changed(self):
         pass
         ## ToDo: accumulate input to hinge node && consider rotation contraints of this hinge
-        # ...
+        if  self.rot_constraint[0] <= self.rot_angle + self.sf_rot_value.value <= self.rot_constraint[1]:
+            self.rot_angle += self.sf_rot_value.value
+            self.hinge_transform.Transform.value = self.hinge_transform.Transform.value * avango.gua.make_rot_mat(self.sf_rot_value.value, self.rot_axis)

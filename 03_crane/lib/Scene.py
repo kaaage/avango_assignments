@@ -42,7 +42,7 @@ class Scene:
             avango.gua.make_scale_mat(0.5, 0.01, 0.5)
         self.ground_geometry.Material.value.set_uniform("ColorMap", "data/textures/ground/bricks_diffuse.jpg")
         self.ground_geometry.Material.value.set_uniform("NormalMap", "data/textures/ground/bricks_normal.jpg")
-        # PARENT_NODE.Children.value.append(self.ground_geometry)
+        PARENT_NODE.Children.value.append(self.ground_geometry)
         
 
         ## init box0
@@ -52,7 +52,7 @@ class Scene:
             avango.gua.make_scale_mat(0.1)
         self.box0_geometry.Material.value.set_uniform("ColorMap", "data/textures/box1/wood_diffuse.jpg")
         self.box0_geometry.Material.value.set_uniform("NormalMap", "data/textures/box1/wood_normal.jpg")
-        # PARENT_NODE.Children.value.append(self.box0_geometry)
+        PARENT_NODE.Children.value.append(self.box0_geometry)
         self.box_list.append(self.box0_geometry)
         
 
@@ -63,7 +63,7 @@ class Scene:
             avango.gua.make_scale_mat(0.05)
         self.box1_geometry.Material.value.set_uniform("ColorMap", "data/textures/box1/wood_diffuse.jpg")
         self.box1_geometry.Material.value.set_uniform("NormalMap", "data/textures/box1/wood_normal.jpg")
-        # PARENT_NODE.Children.value.append(self.box1_geometry)
+        PARENT_NODE.Children.value.append(self.box1_geometry)
         self.box_list.append(self.box1_geometry)
 
 
@@ -75,7 +75,7 @@ class Scene:
         self.box2_geometry.Material.value.set_uniform("ColorMap", "data/textures/box2/diffuse.jpg")
         self.box2_geometry.Material.value.set_uniform("NormalMap", "data/textures/box2/normal.jpg")
         self.box2_geometry.Material.value.set_uniform("RoughnessMap", "data/textures/box2/roughness.jpg")
-        # PARENT_NODE.Children.value.append(self.box2_geometry)
+        PARENT_NODE.Children.value.append(self.box2_geometry)
         self.box_list.append(self.box2_geometry)
 
 
@@ -87,6 +87,6 @@ class Scene:
         self.box3_geometry.Material.value.set_uniform("ColorMap", "data/textures/box2/diffuse.jpg")
         self.box3_geometry.Material.value.set_uniform("NormalMap", "data/textures/box2/normal.jpg")
         self.box3_geometry.Material.value.set_uniform("RoughnessMap", "data/textures/box2/roughness.jpg")
-        # PARENT_NODE.Children.value.append(self.box3_geometry)
+        PARENT_NODE.Children.value.append(self.box3_geometry)
         self.box_list.append(self.box3_geometry)
     

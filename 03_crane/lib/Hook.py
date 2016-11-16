@@ -21,6 +21,7 @@ class Hook(avango.script.Script):
         PARENT_NODE = None,
         SIZE = 0.1,
         TARGET_LIST = [],
+        OFFSET = 0.0
         ):
 
 
@@ -36,8 +37,8 @@ class Hook(avango.script.Script):
         ## ToDo: init hook node(s)
         # ...
         self.hook_geometry = _loader.create_geometry_from_file("hook_geometry", "data/objects/sphere.obj", avango.gua.LoaderFlags.DEFAULTS)
-        self.hook_geometry.Transform.value = avango.gua.make_scale_mat(SIZE)
-        self.hook_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(0.0, 125.0, 0.0, 1.0))
+        self.hook_geometry.Transform.value = avango.gua.make_trans_mat(0.0, OFFSET, 0.0) * avango.gua.make_scale_mat(SIZE)
+        self.hook_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(0.0, 1.0, 0.0, 1.0))
 
         PARENT_NODE.Children.value.append(self.hook_geometry)
 
@@ -50,7 +51,6 @@ class Hook(avango.script.Script):
     @field_has_changed(sf_mat)
     def sf_mat_changed(self):
         _pos = self.sf_mat.value.get_translate() # world position of hook
-        
         for _node in self.TARGET_LIST: # iterate over all target nodes
             _bb = _node.BoundingBox.value # get bounding box of a node
             #print(_node.Name.value, _bb.contains(_pos))
