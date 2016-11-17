@@ -87,10 +87,7 @@ class KeyboardInput(avango.script.Script):
 
     def evaluate(self): # evaluated every frame if any input field has changed  
         ## ToDo: realize frame-rate independent mapping
-        self.lf_time = time.time() # save absolute time of last frame (required for frame-rate independent mapping)
-        rot_velocity_coef = (time.time() - self.lf_time) * 1000.0
-        # print(rot_velocity_coef)
-        # rot_velocity_coef = 1/60
+        rot_velocity_coef = (time.time() - self.lf_time)
                 
         ## get rot_value0
         if self.sf_button0.value == True:
@@ -124,4 +121,4 @@ class KeyboardInput(avango.script.Script):
         else:
             self.sf_rot_value2.value = 0.0
 
-        
+        self.lf_time = time.time() # save absolute time of last frame (required for frame-rate independent mapping)
