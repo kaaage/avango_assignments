@@ -43,7 +43,7 @@ class KeyboardInput(avango.script.Script):
         self.super(KeyboardInput).__init__()
    
         ### parameters ###
-        self.rot_velocity = 2.0 # in degrees/frame,Change to degrees per second
+        self.rot_velocity = 120.0 # in degrees/frame,Change to degrees per second
         
         ### variables ###
         self.lf_time = time.time()
@@ -86,33 +86,29 @@ class KeyboardInput(avango.script.Script):
 
 
     def evaluate(self): # evaluated every frame if any input field has changed  
-
-        
-        #self.coef = time.time() - self.lf_time
-        #self.rot_velocity = self.rot_velocity * (self.coef  *60)
-        #print(self.coef)
-
         ## ToDo: realize frame-rate independent mapping
         self.lf_time = time.time() # save absolute time of last frame (required for frame-rate independent mapping)
-
+        rot_velocity_coef = (time.time() - self.lf_time) * 1000.0
+        # print(rot_velocity_coef)
+        # rot_velocity_coef = 1/60
                 
         ## get rot_value0
         if self.sf_button0.value == True:
-            self.sf_rot_value0.value = self.rot_velocity * -1.0
+            self.sf_rot_value0.value = self.rot_velocity * -1.0 * rot_velocity_coef
             #print("0:", self.sf_rot_value0)
 
         elif self.sf_button1.value == True:
-            self.sf_rot_value0.value = self.rot_velocity
+            self.sf_rot_value0.value = self.rot_velocity * rot_velocity_coef
         
         else:
             self.sf_rot_value0.value = 0.0
 
         ## get rot_value1
         if self.sf_button2.value == True:
-            self.sf_rot_value1.value = self.rot_velocity * -1.0
+            self.sf_rot_value1.value = self.rot_velocity * -1.0 * rot_velocity_coef
 
         elif self.sf_button3.value == True:
-            self.sf_rot_value1.value = self.rot_velocity
+            self.sf_rot_value1.value = self.rot_velocity * rot_velocity_coef
         
         else:
             self.sf_rot_value1.value = 0.0
@@ -120,10 +116,10 @@ class KeyboardInput(avango.script.Script):
 
         ## get rot_value2
         if self.sf_button4.value == True:
-            self.sf_rot_value2.value = self.rot_velocity * -1.0
+            self.sf_rot_value2.value = self.rot_velocity * -1.0 * rot_velocity_coef
 
         elif self.sf_button5.value == True:
-            self.sf_rot_value2.value = self.rot_velocity
+            self.sf_rot_value2.value = self.rot_velocity * rot_velocity_coef
         
         else:
             self.sf_rot_value2.value = 0.0
