@@ -118,10 +118,10 @@ class ManipulationManager(avango.script.Script):
                     _node.Parent.value.Children.value.remove(_node)
                     self.hand_transform.Children.value.append(_node)
                     _node.Transform.value = avango.gua.make_inverse_mat(self.hand_transform.WorldTransform.value) * _node.Transform.value 
-
                     pass
 
                 elif self.dragging_technique == 2: # absolute tool-hand offset to tool space
+                    _node.DraggingOffsetMatrix.value  = avango.gua.make_inverse_mat(self.hand_transform.WorldTransform.value) * _node.Transform.value
                     pass
 
                 elif self.dragging_technique == 3: # relative tool input to object space
@@ -159,9 +159,12 @@ class ManipulationManager(avango.script.Script):
                 pass
 
             elif self.dragging_technique == 2: # absolute tool-hand offset to tool space
+                _node.Transform.value = self.hand_transform.WorldTransform.value * _node.DraggingOffsetMatrix.value
                 pass
 
             elif self.dragging_technique == 3: # relative tool input to object space
+                self.diff_hand_mat  = avango.gua.make_inverse_mat(self.lf_hand_mat) * self.hand_transform.WorldTransform.value
+                _node.Transform.value = self.diff_hand_mat * _node.Transform.value
                 pass
 
   
@@ -234,7 +237,7 @@ class ManipulationManager(avango.script.Script):
 
         self.object_dragging() # possibly drag object with hand input
 
-        self.lf_hand_mat = self.hand_transform.Transform.value
+        self.lf_hand_mat = self.hand_transform.WorldTransform.value
         
 
 class Manipulation(avango.script.Script):
