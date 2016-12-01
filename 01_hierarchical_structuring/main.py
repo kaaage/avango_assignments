@@ -59,6 +59,9 @@ def start():
     viewingSetup.connect_navigation_matrix(steeringNavigation.sf_nav_mat)
     steeringNavigation.set_rotation_center_offset(viewingSetup.get_head_position())
 
+    print_graph(scenegraph.Root.value)
+
+
     viewingSetup.run(locals(), globals())
 
 

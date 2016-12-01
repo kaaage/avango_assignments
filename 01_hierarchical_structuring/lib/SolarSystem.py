@@ -21,7 +21,7 @@ class OrbitVisualization:
             return
 
         ### parameters ###
-        self.number_of_segments = 400
+        self.number_of_segments = 10
         self.thickness = 0.001  
         self.color = avango.gua.Color(1.0,1.0,1.0)
         
@@ -162,44 +162,44 @@ class SolarSystem(avango.script.Script):
             ROTATION_DURATION = 58, # in days
             )
         ## init Mars
-        self.mars = SolarObject(
-            NAME = "mars",
-            TEXTURE_PATH = "data/textures/planets/Mars.jpg",
-            PARENT_NODE = PARENT_NODE,
-            SF_TIME_SCALE = self.sf_time_scale_factor,
-            DIAMETER = 12756, # downscale sun geometry relative to planet sizes
-            ORBIT_RADIUS = 199000000, # in km
-            ORBIT_INCLINATION = 0, # in degrees
-            ORBIT_DURATION = 365, # in days
-            ROTATION_INCLINATION = 24, # in degrees
-            ROTATION_DURATION = 1, # in days
-            )
-        ## init Jupiter
-        self.jupiter = SolarObject(
-            NAME = "jupiter",
-            TEXTURE_PATH = "data/textures/planets/jupiter_rgb_cyl_www.jpg",
-            PARENT_NODE = PARENT_NODE,
-            SF_TIME_SCALE = self.sf_time_scale_factor,
-            DIAMETER = 69911, # downscale sun geometry relative to planet sizes
-            ORBIT_RADIUS = 239000000, # in km
-            ORBIT_INCLINATION = 20, # in degrees
-            ORBIT_DURATION = 4, # in days
-            ROTATION_INCLINATION = 40, # in degrees
-            ROTATION_DURATION = 5, # in days
-            )
-        ## init Jupiter-Moons
-        self.jupitermoon = SolarObject(
-            NAME = "jupitermoon",
-            TEXTURE_PATH = "data/textures/planets/ganymede.jpg",
-            PARENT_NODE = self.jupiter.get_orbit_node(),
-            SF_TIME_SCALE = self.sf_time_scale_factor,
-            DIAMETER = 3476, # downscale sun geometry relative to planet sizes
-            ORBIT_RADIUS = 58000000, # in km
-            ORBIT_INCLINATION = 7, # in degrees
-            ORBIT_DURATION = 87, # in days
-            ROTATION_INCLINATION = 0.0, # in degrees
-            ROTATION_DURATION = 58, # in days
-            )
+        # self.mars = SolarObject(
+        #     NAME = "mars",
+        #     TEXTURE_PATH = "data/textures/planets/Mars.jpg",
+        #     PARENT_NODE = PARENT_NODE,
+        #     SF_TIME_SCALE = self.sf_time_scale_factor,
+        #     DIAMETER = 12756, # downscale sun geometry relative to planet sizes
+        #     ORBIT_RADIUS = 199000000, # in km
+        #     ORBIT_INCLINATION = 0, # in degrees
+        #     ORBIT_DURATION = 365, # in days
+        #     ROTATION_INCLINATION = 24, # in degrees
+        #     ROTATION_DURATION = 1, # in days
+        #     )
+        # ## init Jupiter
+        # self.jupiter = SolarObject(
+        #     NAME = "jupiter",
+        #     TEXTURE_PATH = "data/textures/planets/jupiter_rgb_cyl_www.jpg",
+        #     PARENT_NODE = PARENT_NODE,
+        #     SF_TIME_SCALE = self.sf_time_scale_factor,
+        #     DIAMETER = 69911, # downscale sun geometry relative to planet sizes
+        #     ORBIT_RADIUS = 239000000, # in km
+        #     ORBIT_INCLINATION = 20, # in degrees
+        #     ORBIT_DURATION = 4, # in days
+        #     ROTATION_INCLINATION = 40, # in degrees
+        #     ROTATION_DURATION = 5, # in days
+        #     )
+        # ## init Jupiter-Moons
+        # self.jupitermoon = SolarObject(
+        #     NAME = "jupitermoon",
+        #     TEXTURE_PATH = "data/textures/planets/ganymede.jpg",
+        #     PARENT_NODE = self.jupiter.get_orbit_node(),
+        #     SF_TIME_SCALE = self.sf_time_scale_factor,
+        #     DIAMETER = 3476, # downscale sun geometry relative to planet sizes
+        #     ORBIT_RADIUS = 58000000, # in km
+        #     ORBIT_INCLINATION = 7, # in degrees
+        #     ORBIT_DURATION = 87, # in days
+        #     ROTATION_INCLINATION = 0.0, # in degrees
+        #     ROTATION_DURATION = 58, # in days
+        #     )
         ## init ...
 
 
@@ -297,17 +297,20 @@ class SolarObject:
            
         ## init transformation nodes for specific solar object aspects        
         self.orbit_radius_node = avango.gua.nodes.TransformNode(Name = NAME + "_orbit_radius_node")
-        self.orbit_radius_node.Children.value = [self.object_geometry, self.axis1_geometry]        
+        self.orbit_radius_node.Children.value = [self.orbit_inclination_node, self.axis1_geometry]       #What is this line doing? 
         self.orbit_radius_node.Transform.value = avango.gua.make_trans_mat(self.orbit_radius, 0.0, 0.0)
         PARENT_NODE.Children.value.append(self.orbit_radius_node)
         
+        
         # evtl. init further transformation nodes here ...
         self.orbit_inclination_node = avango.gua.nodes.TransformNode(Name = NAME + '_orbit_inclination_node')
-        self.orbit_inclination_node.Children.value = [self.object_geometry, self.axis1_geometry]
-        self.orbit_inclination_node.Transform.value = avango.gua.make_rot_mat(ORBIT_INCLINATION, 0, 0, 0)
-        PARENT_NODE.Children.value.append(self.orbit_inclination_node)
+        self.orbit_inclination_node.Children.value = [self.object_geometry]
+        self.orbit_inclination_node.Transform.value = avango.gua.make_rot_mat(ORBIT_INCLINATION, 0, 1, 0)
+        #self.orbit_radius_node.Children.value.append(self.orbit_inclination_node)
 
-        self.rotation_inclination_node = avango.gua.nodes.TransformNode(Name = NAME + '_rotation_inclination_node')
+        
+
+        #self.rotation_inclination_node = avango.gua.nodes.TransformNode(Name = NAME + '_rotation_inclination_node')
 
         ## sub classes
         # init orbit visualization here ...
