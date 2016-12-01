@@ -117,7 +117,7 @@ class ManipulationManager(avango.script.Script):
                 if self.dragging_technique == 1: # change of node order in scenegraph
                     _node.Parent.value.Children.value.remove(_node)
                     self.hand_transform.Children.value.append(_node)
-                    _node.Transform.value = avango.gua.make_inverse_mat(_hand_mat) * _node.Transform.value 
+                    _node.Transform.value = avango.gua.make_inverse_mat(self.hand_transform.WorldTransform.value) * _node.Transform.value 
 
                     pass
 
@@ -130,10 +130,12 @@ class ManipulationManager(avango.script.Script):
   
   
     def update_dragging_candidates(self):
-        _hand_pos = self.hand_transform.Transform.value.get_translate()
+        #_hand_pos = self.hand_transform.Transform.value.get_translate()
+        _hand_pos = self.hand_transform.WorldTransform.value.get_translate() #without WorldTransform when changing viewport the detection of correct monkey dist breaks
     
         for _node in self.TARGET_LIST:
-            _pos = _node.Transform.value.get_translate() # a monkey position
+            #_pos = _node.Transform.value.get_translate() # a monkey position
+            _pos = _node.WorldTransform.value.get_translate() # a monkey position
 
             _dist = (_hand_pos - _pos).length() # hand-object distance
             _color = _node.CurrentColor.value
