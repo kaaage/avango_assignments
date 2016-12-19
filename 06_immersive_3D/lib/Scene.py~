@@ -1,0 +1,70 @@
+#!/usr/bin/python
+
+### import guacamole libraries
+import avango
+import avango.gua
+
+### import python libraries
+import random
+
+
+class Scene:
+
+    ## constructor
+    def __init__(self,
+        PARENT_NODE = None,
+        ):
+
+        ### resources ###
+       
+        _loader = avango.gua.nodes.TriMeshLoader() # get trimesh loader to load external tri-meshes
+       
+        ## init scene light               
+        self.light_geometry = _loader.create_geometry_from_file("light_geometry", "data/objects/cone.obj", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.MAKE_PICKABLE)
+        self.light_geometry.Transform.value = avango.gua.make_trans_mat(0.0, 0.5, 0.3) * avango.gua.make_rot_mat(90.0,-1,0,0) * avango.gua.make_scale_mat(0.1)
+        PARENT_NODE.Children.value.append(self.light_geometry)
+
+
+        self.scene_light = avango.gua.nodes.LightNode(Name = "scene_light")
+        self.scene_light.Type.value = avango.gua.LightType.SPOT
+        self.scene_light.Color.value = avango.gua.Color(1.0,1.0,0.8)
+        self.scene_light.Brightness.value = 20.0
+        self.scene_light.Falloff.value = 0.1 # exponent
+        self.scene_light.EnableShadows.value = True
+        self.scene_light.ShadowMapSize.value = 2048
+        self.scene_light.Transform.value = avango.gua.make_scale_mat(10.0) * avango.gua.make_scale_mat(4.0,4.0,2.0)
+        self.scene_light.ShadowNearClippingInSunDirection.value = 2.0 / 0.1
+        #self.scene_light.ShadowFarClippingInSunDirection.value = 10.0
+        self.scene_light.ShadowMaxDistance.value = 10.0 # maximal distance, the shadow is visible
+        self.light_geometry.Children.value = [self.scene_light]
+
+
+        ## init scene geometries        
+
+        ## load ground geometry
+        self.ground_geometry = _loader.create_geometry_from_file("ground_geometry", "data/objects/cube.obj", avango.gua.LoaderFlags.DEFAULTS)
+        self.ground_geometry.Transform.value = \
+            avango.gua.make_trans_mat(0.0, -0.25, 0.0) * \
+            avango.gua.make_scale_mat(1.5, 0.01, 1.5)
+        #self.ground_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(1.0, 0.0, 0.0, 1.0)) # RGBA
+        self.ground_geometry.Material.value.set_uniform("ColorMap", "data/textures/ground/bricks_diffuse.jpg")
+        self.ground_geometry.Material.value.set_uniform("NormalMap", "data/textures/ground/bricks_normal.jpg")
+        PARENT_NODE.Children.value.append(self.ground_geometry)
+        
+
+        ## load car geometry
+        self.passat_group = _loader.create_geometry_from_file("passat", "/opt/3d_models/cars/passat/passat.obj", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.LOAD_MATERIALS | avango.gua.LoaderFlags.MAKE_PICKABLE)
+        self.passat_group.Transform.value = \
+            avango.gua.make_trans_mat(0.0,-0.25,0.0) * \
+            avango.gua.make_rot_mat(-90.0,1,0,0) * \
+            avango.gua.make_rot_mat(-45.0,0,0,1) * \
+            avango.gua.make_scale_mat(0.0045)
+        PARENT_NODE.Children.value.append(self.passat_group)
+
+        for _node in self.passat_group.Children.value:
+            _node.Material.value.set_uniform("Emissivity", 0.20) # 20% self-lighting
+            _node.Material.value.EnableBackfaceCulling.value = False
+        
+        # manually enable transparency on glass geometry nodes (not parsed when loading OBJ files)
+        self.passat_group.Children.value[1].Material.value.set_uniform("Color", avango.gua.Vec4(0.75,0.8,0.9,0.2))        
+        
