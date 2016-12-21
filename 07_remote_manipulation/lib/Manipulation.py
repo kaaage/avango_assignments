@@ -6,9 +6,7 @@ import avango.gua
 import avango.script
 from avango.script import field_has_changed
 import avango.daemon
-
-
-
+import math
 
 class ManipulationManager(avango.script.Script):
 
@@ -385,7 +383,7 @@ class VirtualHand(ManipulationTechnique):
 
 
         ### additional parameters ###  
-        self.intersection_point_size = 0.01 # in meter
+        self.intersection_point_size = 0.05 # in meter
 
 
         ### further resources ###
@@ -393,7 +391,10 @@ class VirtualHand(ManipulationTechnique):
 
         ## ToDo: init hand node(s) here
         # ...
+        self.hand_geometry = _loader.create_geometry_from_file("hand_geometry", "data/objects/hand.obj", avango.gua.LoaderFlags.DEFAULTS)
+        self.hand_geometry.Transform.value = avango.gua.make_rot_mat(45,1,0,0) * avango.gua.make_scale_mat(0.5)
 
+        self.pointer_node.Children.value.append(self.hand_geometry)
         
         ### set initial states ###
         self.enable(False)
@@ -402,11 +403,37 @@ class VirtualHand(ManipulationTechnique):
    
     ### callback functions ###
     def evaluate(self): # implement respective base-class function
-        pass
-        
         ## ToDo: init behavior here (use a short ray for object selection --> e.g. 10cm)
         # ...
+        if self.enable_flag == False:
+            return
+    
+
+        ## calc ray intersection
+        _mf_pick_result = self.calc_pick_result(PICK_MAT = self.pointer_node.WorldTransform.value, PICK_LENGTH = 0.10)
+        #print("hits:", len(_mf_pick_result.value))
+    
+        if len(_mf_pick_result.value) > 0: # intersection found
+            self.pick_result = _mf_pick_result.value[0] # get first pick result
+        else: # nothing hit
+            self.pick_result = None
         
+        ## update visualizations
+        if self.pick_result is None:
+            # self.hand_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(1.0,0.0,0.0,1.0))
+            return
+        else:
+            # self.hand_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(1.0,0.0,0.0,0.85)) # highlight color
+            _node = self.pick_result.Object.value # get intersected geometry node
+
+            _pick_pos = self.pick_result.Position.value # pick position in object coordinate system
+            _pick_world_pos = self.pick_result.WorldPosition.value # pick position in world coordinate system
+
+            print(_node, _pick_pos, _pick_world_pos)
+   
+        
+        ## possibly update object dragging
+        self.dragging()        
 
 
 class GoGo(ManipulationTechnique):
@@ -443,6 +470,12 @@ class GoGo(ManipulationTechnique):
         
         ## ToDo: init hand node(s) here
         # ...
+        self.hand_geometry = _loader.create_geometry_from_file("hand_geometry", "data/objects/hand.obj", avango.gua.LoaderFlags.DEFAULTS)
+        self.hand_geometry.Transform.value = avango.gua.make_rot_mat(45,1,0,0) * avango.gua.make_scale_mat(0.5)
+
+        self.pointer_node.Children.value.append(self.hand_geometry)
+        # self.HEAD_NODE.Children.value.append(self.hand_geometry)
+        
         
         ### set initial states ###
         self.enable(False)
@@ -451,10 +484,54 @@ class GoGo(ManipulationTechnique):
 
     ### callback functions ###
     def evaluate(self): # implement respective base-class function
-        pass
-        
         ## ToDo: init behavior here (use a short ray for object selection --> e.g. 10cm)
         # ...
+        if self.enable_flag == False:
+            return
+
+        _x = self.mf_dof.value[0]
+        _y = self.mf_dof.value[1]
+        _z = self.
+
+        delta = (math.fabs(_x) + math.fabs(_y)) * 4
+
+        _head_pos = self.HEAD_NODE.Transform.value.get_translate()
+        _pointer_pos = self.pointer_node.Transform.value.get_translate()
+        _dist = (_pointer_pos - _head_pos).length()
+        # if _dist < 0.35:
+        # print("dist: " + str(_dist) + " dist pow: " + str(math.pow(_dist, 2)) )
+        # _dist = math.pow(_dist, 2)
+        # self.pointer_node.Transform.value = self.pointer_node.Transform.value * _dist
+
+
+        # self.hand_geometry.Transform.value = self.pointer_node.Transform.value * _dist
+
+
+        ## calc ray intersection
+        _mf_pick_result = self.calc_pick_result(PICK_MAT = self.pointer_node.WorldTransform.value, PICK_LENGTH = 0.10)
+        #print("hits:", len(_mf_pick_result.value))
+    
+        if len(_mf_pick_result.value) > 0: # intersection found
+            self.pick_result = _mf_pick_result.value[0] # get first pick result
+        else: # nothing hit
+            self.pick_result = None
+        
+        ## update visualizations
+        if self.pick_result is None:
+            # self.hand_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(1.0,0.0,0.0,1.0))
+            return
+        else:
+            # self.hand_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(1.0,0.0,0.0,0.85)) # highlight color
+            _node = self.pick_result.Object.value # get intersected geometry node
+
+            _pick_pos = self.pick_result.Position.value # pick position in object coordinate system
+            _pick_world_pos = self.pick_result.WorldPosition.value # pick position in world coordinate system
+
+            # print(_node, _pick_pos, _pick_world_pos)
+   
+        
+        ## possibly update object dragging
+        self.dragging()        
 
 
 
