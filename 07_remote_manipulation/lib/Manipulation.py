@@ -176,8 +176,7 @@ class ManipulationTechnique(avango.script.Script):
         self.pointer_node.Transform.connect_from(self.pointer_tracking_sensor.Matrix)
         self.pointer_node.Tags.value = ["invisible"]
         NAVIGATION_NODE.Children.value.append(self.pointer_node)
-        
-
+            
         self.ray = avango.gua.nodes.Ray() # required for trimesh intersection
             
         self.always_evaluate(True) # change global evaluation policy
@@ -420,10 +419,10 @@ class VirtualHand(ManipulationTechnique):
         
         ## update visualizations
         if self.pick_result is None:
-            # self.hand_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(1.0,0.0,0.0,1.0))
+            self.hand_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(1.0,1.0,1.0,1.0))
             return
         else:
-            # self.hand_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(1.0,0.0,0.0,0.85)) # highlight color
+            self.hand_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(0.5,1.5,1.0,0.85)) # highlight color
             _node = self.pick_result.Object.value # get intersected geometry node
 
             _pick_pos = self.pick_result.Position.value # pick position in object coordinate system
@@ -470,11 +469,18 @@ class GoGo(ManipulationTechnique):
         
         ## ToDo: init hand node(s) here
         # ...
+
+         #mapped pointer node
+        self.mapped_pointer_node = avango.gua.nodes.TransformNode(Name = "mapped_pointer_node")   
+        #self.mapped_pointer_node.Transform.value = avango.gua.make_trans_mat(0.0, 0.0, 0.0) 
+        #self.mapped_pointer_node.Tags.value = ["invisible"]
+        NAVIGATION_NODE.Children.value.append(self.mapped_pointer_node)
+
         self.hand_geometry = _loader.create_geometry_from_file("hand_geometry", "data/objects/hand.obj", avango.gua.LoaderFlags.DEFAULTS)
         self.hand_geometry.Transform.value = avango.gua.make_rot_mat(45,1,0,0) * avango.gua.make_scale_mat(0.5)
 
-        self.pointer_node.Children.value.append(self.hand_geometry)
-        # self.HEAD_NODE.Children.value.append(self.hand_geometry)
+        self.mapped_pointer_node.Children.value.append(self.hand_geometry)
+        #self.mapped_pointer_node.Transform.connect_from(self.pointer_tracking_sensor.Matrix)
         
         
         ### set initial states ###
@@ -485,26 +491,37 @@ class GoGo(ManipulationTechnique):
     ### callback functions ###
     def evaluate(self): # implement respective base-class function
         ## ToDo: init behavior here (use a short ray for object selection --> e.g. 10cm)
-        # ...
         if self.enable_flag == False:
+            self.hand_geometry.Tags.value = ["invisible"]
             return
 
-        _x = self.mf_dof.value[0]
-        _y = self.mf_dof.value[1]
-        _z = self.
 
-        delta = (math.fabs(_x) + math.fabs(_y)) * 4
+        self.hand_geometry.Tags.value = ["visible"]
 
-        _head_pos = self.HEAD_NODE.Transform.value.get_translate()
+
+        _x = self.pointer_node.Transform.value.get_element(0,3)
+        _y = self.pointer_node.Transform.value.get_element(1,3)
+        _z = self.pointer_node.Transform.value.get_element(2,3)
+        # print("x:"+str(_x)+" y:"+str(_y)+" z:"+str(_z))
+
+        # todo: get rotation components
+
+        # _head_pos = self.HEAD_NODE.Transform.value.get_translate()
+        _body_pos = avango.gua.make_trans_mat(self.HEAD_NODE.Transform.value.get_element(0,3), \
+            0.0, self.HEAD_NODE.Transform.value.get_element(2,3)).get_translate()
         _pointer_pos = self.pointer_node.Transform.value.get_translate()
-        _dist = (_pointer_pos - _head_pos).length()
-        # if _dist < 0.35:
-        # print("dist: " + str(_dist) + " dist pow: " + str(math.pow(_dist, 2)) )
-        # _dist = math.pow(_dist, 2)
-        # self.pointer_node.Transform.value = self.pointer_node.Transform.value * _dist
+        _dist = (_pointer_pos - _body_pos).length()
+        if _dist > 0.30:
+            # print("dist: " + str(_dist) + " dist pow: " + str(_dist + math.pow((_dist - self.gogo_threshold), 2)) )
+            _new_dist = (1/6 * math.pow((_dist - 0.30), 2))
+            # _coef = (_new_dist / _dist) * 2.0
+            # print(_coef)
+            self.mapped_pointer_node.Transform.value = avango.gua.make_trans_mat(_x + _new_dist, 1.0, _z + _new_dist) # todo: add rotation matix
+            # self.mapped_pointer_node.Transform.value = avango.gua.make_trans_mat(_x, _y, _z)
+        else:
+            self.mapped_pointer_node.Transform.value = self.pointer_node.Transform.value
 
-
-        # self.hand_geometry.Transform.value = self.pointer_node.Transform.value * _dist
+        print(self.mapped_pointer_node.Transform.value)
 
 
         ## calc ray intersection
@@ -518,10 +535,10 @@ class GoGo(ManipulationTechnique):
         
         ## update visualizations
         if self.pick_result is None:
-            # self.hand_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(1.0,0.0,0.0,1.0))
+            self.hand_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(1.0,1.0,1.0,1.0))
             return
         else:
-            # self.hand_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(1.0,0.0,0.0,0.85)) # highlight color
+            self.hand_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(0.5,1.5,1.0,0.85)) # highlight color
             _node = self.pick_result.Object.value # get intersected geometry node
 
             _pick_pos = self.pick_result.Position.value # pick position in object coordinate system
