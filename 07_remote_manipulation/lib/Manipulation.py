@@ -380,7 +380,6 @@ class VirtualHand(ManipulationTechnique):
         ManipulationTechnique.my_constructor(self, SCENEGRAPH, NAVIGATION_NODE, POINTER_TRACKING_STATION, TRACKING_TRANSMITTER_OFFSET, POINTER_DEVICE_STATION) # call base class constructor
 
 
-
         ### additional parameters ###  
         self.intersection_point_size = 0.05 # in meter
 
@@ -406,6 +405,8 @@ class VirtualHand(ManipulationTechnique):
         # ...
         if self.enable_flag == False:
             return
+
+        print(self.pointer_node.Transform.value)
     
 
         ## calc ray intersection
@@ -428,7 +429,7 @@ class VirtualHand(ManipulationTechnique):
             _pick_pos = self.pick_result.Position.value # pick position in object coordinate system
             _pick_world_pos = self.pick_result.WorldPosition.value # pick position in world coordinate system
 
-            print(_node, _pick_pos, _pick_world_pos)
+            # print(_node, _pick_pos, _pick_world_pos)
    
         
         ## possibly update object dragging
@@ -495,29 +496,21 @@ class GoGo(ManipulationTechnique):
             self.hand_geometry.Tags.value = ["invisible"]
             return
 
-
         self.hand_geometry.Tags.value = ["visible"]
-
 
         _x = self.pointer_node.Transform.value.get_element(0,3)
         _y = self.pointer_node.Transform.value.get_element(1,3)
         _z = self.pointer_node.Transform.value.get_element(2,3)
-        # print("x:"+str(_x)+" y:"+str(_y)+" z:"+str(_z))
 
-        # todo: get rotation components
-
-        # _head_pos = self.HEAD_NODE.Transform.value.get_translate()
         _body_pos = avango.gua.make_trans_mat(self.HEAD_NODE.Transform.value.get_element(0,3), \
-            0.0, self.HEAD_NODE.Transform.value.get_element(2,3)).get_translate()
+            -0.5, self.HEAD_NODE.Transform.value.get_element(2,3)).get_translate()
         _pointer_pos = self.pointer_node.Transform.value.get_translate()
         _dist = (_pointer_pos - _body_pos).length()
-        if _dist > 0.30:
-            # print("dist: " + str(_dist) + " dist pow: " + str(_dist + math.pow((_dist - self.gogo_threshold), 2)) )
-            _new_dist = (1/6 * math.pow((_dist - 0.30), 2))
-            # _coef = (_new_dist / _dist) * 2.0
+        if _dist >= self.gogo_threshold:
+            _new_dist = _dist + (math.pow((_dist - self.gogo_threshold), 2))
+            _coef = (_new_dist / _dist) * 1.5
             # print(_coef)
-            self.mapped_pointer_node.Transform.value = avango.gua.make_trans_mat(_x + _new_dist, 1.0, _z + _new_dist) # todo: add rotation matix
-            # self.mapped_pointer_node.Transform.value = avango.gua.make_trans_mat(_x, _y, _z)
+            self.mapped_pointer_node.Transform.value = self.pointer_node.Transform.value * avango.gua.make_trans_mat(_x * _coef, _y * _coef, ((_z - 0.6) * _coef) + 0.6)
         else:
             self.mapped_pointer_node.Transform.value = self.pointer_node.Transform.value
 
@@ -525,7 +518,7 @@ class GoGo(ManipulationTechnique):
 
 
         ## calc ray intersection
-        _mf_pick_result = self.calc_pick_result(PICK_MAT = self.pointer_node.WorldTransform.value, PICK_LENGTH = 0.10)
+        _mf_pick_result = self.calc_pick_result(PICK_MAT = self.mapped_pointer_node.WorldTransform.value, PICK_LENGTH = 0.10)
         #print("hits:", len(_mf_pick_result.value))
     
         if len(_mf_pick_result.value) > 0: # intersection found
@@ -544,11 +537,40 @@ class GoGo(ManipulationTechnique):
             _pick_pos = self.pick_result.Position.value # pick position in object coordinate system
             _pick_world_pos = self.pick_result.WorldPosition.value # pick position in world coordinate system
 
-            # print(_node, _pick_pos, _pick_world_pos)
+            print(_node, _pick_pos, _pick_world_pos)
    
         
         ## possibly update object dragging
         self.dragging()        
+
+    def enable(self, BOOL):
+        self.enable_flag = BOOL
+        
+        if self.enable_flag == True:
+            self.pointer_node.Tags.value = [] # set tool visible
+            self.mapped_pointer_node.Tags.value = [] # set tool visible
+        else:
+            self.stop_dragging() # possibly stop active dragging process
+            
+            self.pointer_node.Tags.value = ["invisible"] # set tool invisible
+            self.mapped_pointer_node.Tags.value = ["invisible"] # set tool invisible
+
+    def start_dragging(self, NODE):
+        self.dragged_node = NODE        
+        self.dragging_offset_mat = avango.gua.make_inverse_mat(self.mapped_pointer_node.WorldTransform.value) * self.dragged_node.WorldTransform.value # object transformation in pointer coordinate system
+
+  
+    def stop_dragging(self): 
+        self.dragged_node = None
+        self.dragging_offset_mat = avango.gua.make_identity_mat()
+
+
+    def dragging(self):
+        if self.dragged_node is not None: # object to drag
+            _new_mat = self.mapped_pointer_node.WorldTransform.value * self.dragging_offset_mat # new object position in world coodinates
+            _new_mat = avango.gua.make_inverse_mat(self.dragged_node.Parent.value.WorldTransform.value) * _new_mat # transform new object matrix from global to local space
+        
+            self.dragged_node.Transform.value = _new_mat
 
 
 
