@@ -107,7 +107,7 @@ class StereoViewingSetup:
         self.camera_node.SceneGraph.value = SCENEGRAPH.Name.value
         self.camera_node.LeftScreenPath.value = self.screen_node.Path.value
         self.camera_node.RightScreenPath.value = self.screen_node.Path.value
-        self.camera_node.NearClip.value = 0.1 # in meter
+        self.camera_node.NearClip.value = 0.02 # in meter
         self.camera_node.FarClip.value = 100.0 # in meter
         self.camera_node.Resolution.value = WINDOW_RESOLUTION
         self.camera_node.OutputWindowName.value = self.window.Title.value
