@@ -671,7 +671,6 @@ class Homer(ManipulationTechnique):
 
         else: # something hit
             #self.ray_geometry.Tags.value = ["invisible"] # set intersection point invisible
-
             self.ray_geometry.Transform.value = \
                 avango.gua.make_trans_mat(0.0,0.0,PICK_DISTANCE * -0.5) * \
                 avango.gua.make_rot_mat(-90.0,1,0,0) * \
@@ -679,27 +678,12 @@ class Homer(ManipulationTechnique):
 
             self.intersection_geometry.Tags.value = ["visible"] # set intersection point visible
             self.intersection_geometry.Transform.value = avango.gua.make_trans_mat(PICK_WORLD_POS) * avango.gua.make_scale_mat(self.intersection_point_size)
-            #this step should happen within the dragging, not already before
-            # self.last_intersection_node.Transform.value = self.intersection_geometry.Transform.value
-            # self.hand_geometry.Transform.value = self.last_intersection_node.Transform.value
 
 
     ### callback functions ###
     def evaluate(self): # implement respective base-class function
         if self.enable_flag == False:
             return
-
-
-
-        # _body_pos = self.HEAD_NODE.Transform.value.get_translate()
-        # _pointer_pos = self.pointer_node.Transform.value.get_translate()
-        # _dist = (_pointer_pos - _body_pos).length()
-        # #calculate the scale factor: ratio of body-pointer / body-selected-object
-        # _new_dist = _dist # multiply by scale factor
-        # _coef = (_new_dist / _dist)
-        # print(_coef)
-        # self.mapped_pointer_node.Transform.value = avango.gua.make_trans_mat(_x, _y, ((_z - 0.6) * _coef) + 0.6)
-    
 
         ## calc ray intersection
         _mf_pick_result = self.calc_pick_result(PICK_MAT = self.pointer_node.WorldTransform.value, PICK_LENGTH = self.ray_length)
@@ -741,18 +725,6 @@ class Homer(ManipulationTechnique):
 
         ## possibly update object dragging
 
-    # def enable(self, BOOL):
-    #     self.enable_flag = BOOL
-        
-    #     if self.enable_flag == True:
-    #         self.pointer_node.Tags.value = [] # set tool visible
-    #         self.mapped_pointer_node.Tags.value = [] # set tool visible
-    #     else:
-    #         self.stop_dragging() # possibly stop active dragging process
-            
-    #         self.pointer_node.Tags.value = ["invisible"] # set tool invisible
-    #         self.mapped_pointer_node.Tags.value = ["invisible"] # set tool invisible
-
     def start_dragging(self, NODE):
         self.dragged_node = NODE
 
@@ -764,58 +736,38 @@ class Homer(ManipulationTechnique):
         self._coef = self._odist / self._dist
         print("coef: " + str(self._coef))
 
-        self._dx = self.pointer_node.Transform.value.get_element(0,3)
-        self._dy = self.pointer_node.Transform.value.get_element(1,3)
-        self._dz = self.pointer_node.Transform.value.get_element(2,3)
+        self._ox = self.pointer_node.Transform.value.get_element(0,3)
+        self._oy = self.pointer_node.Transform.value.get_element(1,3)
+        self._oz = self.pointer_node.Transform.value.get_element(2,3)
 
-        #self.intersection_geometry.Tags.value = ["invisible"]
-        #self.ray_geometry.Tags.value = ["invisible"] # set intersection point invisible
         self._rot = avango.gua.make_rot_mat(self.dragged_node.WorldTransform.value.get_rotate_scale_corrected())
         self._scale = avango.gua.make_scale_mat(self.dragged_node.WorldTransform.value.get_scale())
         self._trans = avango.gua.make_trans_mat(self.dragged_node.WorldTransform.value.get_translate())
 
-        self.ox = self.dragged_node.Transform.value.get_element(0,3)
-        self.oy = self.dragged_node.Transform.value.get_element(1,3)
-        self.oz = self.dragged_node.Transform.value.get_element(2,3)
-        # self.mapped_pointer_node.Transform.value = self._trans * self._rot * self._scale
-        # self.mapped_pointer_node.Transform.value = self.dragged_node.WorldTransform.value
-        #self.rotation_offset_mat = avango.gua.make_inverse_mat(self.mapped_pointer_node.WorldTransform.value.get_rotate_scale_corrected()) * self.dragged_node.WorldTransform.value.get_rotate_scale_corrected() # object transformation in pointer coordinate system
-        #self._rot_off = avango.gua.make_rot_mat(self.dragged_node.WorldTransform.value.get_rotate_scale_corrected()) 
-        #self._distRot = (self.dragged_node.WorldTransform.value.get_rotate_scale_corrected() - self.dragged_node.WorldTransform.value.get_rotate_scale_corrected()).length()
-
-        x = self.pointer_node.Transform.value.get_element(0,3) - self._dx
-        y = self.pointer_node.Transform.value.get_element(1,3) - self._dy
-        z = self.pointer_node.Transform.value.get_element(2,3) - self._dz
-
+        self._ix = self.intersection_geometry.Transform.value.get_element(0,3)
+        self._iy = self.intersection_geometry.Transform.value.get_element(1,3)
+        self._iz = self.intersection_geometry.Transform.value.get_element(2,3)
+        
         _rot = avango.gua.make_rot_mat(self.pointer_node.Transform.value.get_rotate())
-        # self.mapped_pointer_node.Transform.value = avango.gua.make_trans_mat((self.ox + x) * self._coef, (self.oy + y) * self._coef, (self.oz + z) * self._coef) * _rot * self._scale
-        self.mapped_pointer_node.Transform.value = avango.gua.make_trans_mat(self.ox, self.oy, self.oz) * _rot * self._scale
+        self.mapped_pointer_node.Transform.value = avango.gua.make_trans_mat((self._ix), (self._iy), (self._iz)) * _rot
         self.dragging_offset_mat = avango.gua.make_inverse_mat(self.mapped_pointer_node.WorldTransform.value) * self.dragged_node.WorldTransform.value # object transformation in pointer coordinate system
 
     def stop_dragging(self): 
         self.dragged_node = None
-        #self.rotation_offset_mat = avango.gua.make_identity_mat()
-        #self.intersection_geometry.Tags.value = ["visible"]
-        #self.ray_geometry.Tags.value = ["visible"] # set intersection point invisible
-
         self._dx = 0.0
         self._dy = 0.0
         self._dz = 0.0
 
 
     def dragging(self):
-        x = self.pointer_node.Transform.value.get_element(0,3) - self._dx
-        y = self.pointer_node.Transform.value.get_element(1,3) - self._dy
-        z = self.pointer_node.Transform.value.get_element(2,3) - self._dz
-
         if self.dragged_node is not None: # object to drag
-            # _trans = self.pointer_node.Transform.value.get_translate()
+            _x = self.pointer_node.Transform.value.get_element(0,3) - self._ox
+            _y = self.pointer_node.Transform.value.get_element(1,3) - self._oy
+            _z = self.pointer_node.Transform.value.get_element(2,3) - self._oz
+            # print(_x, _y, _z)
+
             _rot = avango.gua.make_rot_mat(self.pointer_node.Transform.value.get_rotate())
-            # self._rot_diff = avango.gua.make_inverse_mat(self._rot_off) *  avango.gua.make_rot_mat(self.pointer_node.WorldTransform.value.get_rotate_scale_corrected()) 
-            # print(self._dist)
-            # self.mapped_pointer_node.Transform.value = avango.gua.make_trans_mat((self.ox + x) * self._coef, (self.oy + y) * self._coef, (self.oz + z) * self._coef) * _rot * self._scale
-            self.mapped_pointer_node.Transform.value = avango.gua.make_trans_mat(self.ox, self.oy, self.oz) * _rot * self._scale
-            # self.mapped_pointer_node.Transform.value = _trans * _rot
+            self.mapped_pointer_node.Transform.value = avango.gua.make_trans_mat((self._ix + _x), (self._iy + _y), (self._iz + _z) * self._coef) * _rot
 
             _new_mat = self.mapped_pointer_node.WorldTransform.value * self.dragging_offset_mat # new object position in world coodinates
             _new_mat = avango.gua.make_inverse_mat(self.dragged_node.Parent.value.WorldTransform.value) * _new_mat # transform new object matrix from global to local space
