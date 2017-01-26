@@ -44,6 +44,7 @@ class NavigationManager(avango.script.Script):
 
         ### external references ###
         self.SCENEGRAPH = SCENEGRAPH
+        self.NAVIGATION_NODE = NAVIGATION_NODE
         
         ### parameters ###
         self.ray_length = 15.0 # in meter
@@ -249,6 +250,7 @@ class NavigationTechnique(avango.script.Script):
 class SteeringNavigation(NavigationTechnique):
 
     ### fields ###
+    maneuvering = False
 
     ## input fields
     mf_dof = avango.MFFloat()
@@ -325,17 +327,43 @@ class SteeringNavigation(NavigationTechnique):
             _rot_vec.normalize()
             _rot_vec *= _factor
 
+        if not self.maneuvering:
+            ## accumulate input
+            _new_mat = self.NAVIGATION_MANAGER.get_navigation_matrix() * \
+                avango.gua.make_trans_mat(_trans_vec) * \
+                avango.gua.make_rot_mat(_rot_vec.y,0,1,0) * \
+                avango.gua.make_rot_mat(_rot_vec.x,1,0,0) * \
+                avango.gua.make_rot_mat(_rot_vec.z,0,0,1)
 
-        ## accumulate input
-        _new_mat = self.NAVIGATION_MANAGER.get_navigation_matrix() * \
-            avango.gua.make_trans_mat(_trans_vec) * \
-            avango.gua.make_rot_mat(_rot_vec.y,0,1,0) * \
-            avango.gua.make_rot_mat(_rot_vec.x,1,0,0) * \
-            avango.gua.make_rot_mat(_rot_vec.z,0,0,1)
+            self.NAVIGATION_MANAGER.set_navigation_matrix(_new_mat)
+            self.NAVIGATION_MANAGER.calc_pick_result()
+            self.NAVIGATION_MANAGER.update_ray_visualization()
+            # self.pick_result
+        elif self.maneuvering:
+            ## accumulate input
+            _old_mat = self.NAVIGATION_MANAGER.get_navigation_matrix()
+            _trans_vec = avango.gua.Vec3(0.0, 0.0, _trans_vec.z) * self.translation_factor
+            _new_mat = _old_mat * \
+                avango.gua.make_trans_mat(_trans_vec) * \
+                avango.gua.make_rot_mat(_rot_vec.y,0,1,0) * \
+                avango.gua.make_rot_mat(_rot_vec.x,1,0,0) * \
+                avango.gua.make_rot_mat(_rot_vec.z,0,0,1)
 
-        self.NAVIGATION_MANAGER.set_navigation_matrix(_new_mat)
-        self.NAVIGATION_MANAGER.calc_pick_result()
-        self.NAVIGATION_MANAGER.update_ray_visualization()
+            self.NAVIGATION_MANAGER.set_navigation_matrix(_new_mat)
+            self.NAVIGATION_MANAGER.calc_pick_result()
+            self.NAVIGATION_MANAGER.update_ray_visualization()
+
+            # self.intersection_geometry.Transform
+            _old_mat = self.NAVIGATION_MANAGER.get_navigation_matrix()
+            # print(_old_mat)
+            # print(self.NAVIGATION_MANAGER.NAVIGATION_NODE.WorldTransform.value)
+            self.offset_mat = avango.gua.make_inverse_mat(self.NAVIGATION_MANAGER.NAVIGATION_NODE.WorldTransform.value) \
+                * self.NAVIGATION_MANAGER.intersection_geometry.WorldTransform.value
+
+            _new_mat = self.NAVIGATION_MANAGER.NAVIGATION_NODE.WorldTransform.value * self.offset_mat # new object position in world coodinates
+            _new_mat = avango.gua.make_inverse_mat(self.NAVIGATION_MANAGER.intersection_geometry.WorldTransform.value) \
+                * _new_mat # transform new object matrix from global to local space
+            self.NAVIGATION_MANAGER.set_navigation_matrix(_new_mat)
 
 
     @field_has_changed(sf_button)
@@ -344,33 +372,84 @@ class SteeringNavigation(NavigationTechnique):
             return
 
         ## ToDo: enable/disable maneuvering here
-        # ...
+        print(self.sf_button.value)
+        if self.sf_button.value:
+            self.maneuvering = True
+        else:
+            self.maneuvering = False
+
                 
 
 class CameraInHandNavigation(NavigationTechnique):
-    
-    
+
+    sf_button = avango.SFBool()
+    camerainhand = False
+
     ### constructor
     def __init__(self):
         NavigationTechnique.__init__(self) # call base class constructor
-
 
     def my_constructor(self, NAVIGATION_MANAGER):
 
         ### external references ###
         self.NAVIGATION_MANAGER = NAVIGATION_MANAGER
-
+        self.pointer_node = self.NAVIGATION_MANAGER.pointer_node
+        self.NAVIGATION_NODE = self.NAVIGATION_MANAGER.NAVIGATION_NODE
+        self.sf_button.connect_from(self.NAVIGATION_MANAGER.pointer_device_sensor.Button0)
 
         self.always_evaluate(True) # change global evaluation policy
 
-
     ### callback functions ###
     def evaluate(self): # implement respective base-class function
+        ## ToDo: realize camera in hand behavior here
+        if not self.camerainhand:
+            # self.NAVIGATION_NODE.Children.value.append(self.pointer_node)
+            return
+
+        _x = self.pointer_node.Transform.value.get_element(0,3) - self._ox
+        _y = self.pointer_node.Transform.value.get_element(1,3) - self._oy
+        _z = self.pointer_node.Transform.value.get_element(2,3) - self._oz
+
+        # print(_x, _y, _z)
+        #_rot = self.pointer_node.Transform.get_translate() Not possible from Mat4
+        _rot = avango.gua.make_rot_mat(self.pointer_node.Transform.value.get_rotate()) # Not possible with get_rotate from Mat4* avango.gua.Vec3(0.0,0.0,0.0))
+        print(_rot.x)
+        newRot = _rot * avango.gua.make_inverse_mat(self._oRot)
+
+        _navRot = avango.gua.make_inverse_mat(avango.gua.make_rot_mat(self.NAVIGATION_NODE.Transform.value.get_rotate()))
+        _new_mat = avango.gua.make_trans_mat(self._ix + _x*5, self._iy + _y*5, self._iz + _z*5) *  newRot 
+
+        # _new_mat = self.mapped_pointer_node.WorldTransform.value * self.dragging_offset_mat # new object position in world coodinates
+        # _new_mat = avango.gua.make_inverse_mat(self.dragged_node.Parent.value.WorldTransform.value) * _new_mat # transform new object matrix from global to local space
+    
+        self.NAVIGATION_NODE.Transform.value = _new_mat
+
+
+    @field_has_changed(sf_button)
+    def sf_button_changed(self):
         if self.enable_flag == False:
             return
 
-        ## ToDo: realize camera in hand behavior here
-        # ...
+        ## ToDo: enable/disable maneuvering here
+        print(self.sf_button.value)
+        if self.sf_button.value:
+            self.camerainhand = True
+
+            self._ox = self.pointer_node.Transform.value.get_element(0,3)
+            self._oy = self.pointer_node.Transform.value.get_element(1,3)
+            self._oz = self.pointer_node.Transform.value.get_element(2,3)
+
+            self._ix = self.NAVIGATION_NODE.Transform.value.get_element(0,3)
+            self._iy = self.NAVIGATION_NODE.Transform.value.get_element(1,3)
+            self._iz = self.NAVIGATION_NODE.Transform.value.get_element(2,3)
+
+            self._oRot = avango.gua.make_rot_mat(self.NAVIGATION_NODE.WorldTransform.value.get_rotate())
+            self._scale = avango.gua.make_scale_mat(self.NAVIGATION_NODE.WorldTransform.value.get_scale()) 
+            self._trans = avango.gua.make_trans_mat(self.NAVIGATION_NODE.WorldTransform.value.get_translate())
+        else:
+            self.camerainhand = False
+            self._ox=self._oy=self._oz = 0.0
+            self._ix=self._iy=self._iz = 0.0
 
 
 
