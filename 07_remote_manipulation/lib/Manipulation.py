@@ -548,7 +548,7 @@ class GoGo(ManipulationTechnique):
             _new_mat = self.offset_node.WorldTransform.value * self.dragging_offset_mat # new object position in world coodinates
             _new_mat = avango.gua.make_inverse_mat(self.dragged_node.Parent.value.WorldTransform.value) * _new_mat # transform new object matrix from global to local space
         
-            self.dragged_node.Transform.value = _new_mat
+            self.dragged_node.Transform.value = _nemake_iw_mat
 
 
 
