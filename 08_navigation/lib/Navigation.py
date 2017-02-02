@@ -178,11 +178,12 @@ class NavigationManager(avango.script.Script):
         _mf_pick_result = self.SCENEGRAPH.ray_test(self.ray, self.pick_options, self.white_list, self.black_list)
 
         if len(_mf_pick_result.value) > 0: # intersection found
-            print("smth picked")
+            # print("smth picked")
             self.pick_result = _mf_pick_result.value[0] # get first pick result
         else: # nothing hit
-            print("nothing picked")
+            # print("nothing picked")
             self.pick_result = None
+        
 
 
     def update_ray_visualization(self):
@@ -351,27 +352,12 @@ class SteeringNavigation(NavigationTechnique):
                 avango.gua.make_rot_mat(_rot_vec.x,1,0,0) * \
                 avango.gua.make_rot_mat(_rot_vec.z,0,0,1)
             self.point_node.Transform.value = _new_mat
-            print(self.point_node.Transform.value)
-            # print(self.offset_node.WorldTransform.value)
+            _offset_node_transvec = self.offset_node.Transform.value.get_translate()
+            _new_trans_vec = _offset_node_transvec * _trans_vec.z * self.translation_factor
 
-            # _point = self.point_node.WorldTransform.value.get_translate()
-            # _point = avango.gua.Vec3(0.0, 0.0, 0.0)
-            _node = self.offset_node.Transform.value.get_translate()
-            # print(_point)
-            # print(_node)
-            _new_trans_vec = _node * _trans_vec.z * self.translation_factor
-            # print(_new_trans_vec)
-
-            # self.offset_node.Transform.value = self.offset_node.Transform.value * avango.gua.make_trans_mat(_new_trans_vec)
+            self.offset_node.Transform.value = avango.gua.make_trans_mat(_new_trans_vec) * self.offset_node.Transform.value
             self.NAVIGATION_MANAGER.NAVIGATION_NODE.Transform.value = self.point_node.Transform.value \
                 * self.offset_node.Transform.value * self.rot_node.Transform.value
-
-            # print(self.NAVIGATION_MANAGER.NAVIGATION_NODE.Transform.value)
-            # self.NAVIGATION_MANAGER.set_navigation_matrix()
-            # self.NAVIGATION_MANAGER.calc_pick_result()
-            # self.NAVIGATION_MANAGER.update_ray_visualization()
-
-
 
     @field_has_changed(sf_button)
     def sf_button_changed(self):
@@ -379,26 +365,20 @@ class SteeringNavigation(NavigationTechnique):
             return
 
         ## ToDo: enable/disable maneuvering here
-        # print(self.sf_button.value)
         if self.sf_button.value:
             self.maneuvering = True
             
-            self.point_node.Transform.value = avango.gua.make_trans_mat(self.NAVIGATION_MANAGER.intersection_geometry.WorldTransform.value.get_translate())
+            self.point_node.Transform.value = avango.gua.make_trans_mat(self.NAVIGATION_MANAGER.intersection_geometry.WorldTransform.value.get_translate()) \
+                * avango.gua.make_rot_mat(self.NAVIGATION_MANAGER.pointer_node.WorldTransform.value.get_rotate())
             self.offset_node.Transform.value = avango.gua.make_inverse_mat(self.point_node.Transform.value) \
                 * self.NAVIGATION_MANAGER.NAVIGATION_NODE.WorldTransform.value
-            self.rot_node.Transform.value = avango.gua.make_inverse_mat(self.offset_node.Transform.value) \
-                * avango.gua.make_inverse_mat(self.point_node.Transform.value) \
-                * self.NAVIGATION_MANAGER.NAVIGATION_NODE.WorldTransform.value
-            # print(self.point_node.Transform.value)
-            # print(self.offset_node.Transform.value)
-            # print(self.rot_node.Transform.value)
-            # print(self.rot_node.WorldTransform.value)
-            # print(self.NAVIGATION_MANAGER.NAVIGATION_NODE.WorldTransform.value)
-            # print(self.offset_node.Transform.value)
+            self.rot_node.Transform.value = avango.gua.make_inverse_mat(avango.gua.make_rot_mat(self.offset_node.Transform.value.get_rotate())) \
+                * avango.gua.make_inverse_mat(avango.gua.make_rot_mat(self.point_node.Transform.value.get_rotate())) \
+                * avango.gua.make_rot_mat(self.NAVIGATION_MANAGER.NAVIGATION_NODE.WorldTransform.value.get_rotate())
+            print(self.rot_node.WorldTransform.value)
+            print(self.NAVIGATION_MANAGER.NAVIGATION_NODE.WorldTransform.value)
         else:
             self.maneuvering = False
-            # self._trans_vec = avango.gua.Vec3(0.0, 0.0, 0.0)
-
 
 
 class CameraInHandNavigation(NavigationTechnique):
@@ -491,7 +471,6 @@ class NavidgetNavigation(NavigationTechnique):
         self.SCENEGRAPH.Root.value.Children.value.append(self.navidget_node)
 
         self.sphere_geometry = _loader.create_geometry_from_file("sphere_geometry", "data/objects/sphere.obj", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.MAKE_PICKABLE)
-        self.sphere_geometry.Tags.value = ["sphere"]
         self.sphere_geometry.Transform.value = avango.gua.make_scale_mat(50.0)
         self.sphere_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(0.0,0.0,1.0,0.1))
         self.navidget_node.Children.value.append(self.sphere_geometry)
@@ -501,7 +480,7 @@ class NavidgetNavigation(NavigationTechnique):
         self.navidget_node.Children.value.append(self.camera_transform)
 
         self.camera_geometry = _loader.create_geometry_from_file("camera_geometry", "data/objects/camera.obj", avango.gua.LoaderFlags.DEFAULTS)
-        self.camera_geometry.Transform.value = avango.gua.make_scale_mat(5.0)
+        self.camera_geometry.Transform.value = avango.gua.make_scale_mat(150.0)
         self.camera_transform.Children.value.append(self.camera_geometry)
         
         self.sf_button.connect_from(self.NAVIGATION_MANAGER.pointer_device_sensor.Button0)
@@ -542,22 +521,48 @@ class NavidgetNavigation(NavigationTechnique):
 
         ## ToDo: init Navidget behavior here
         # _rot = self.get_rotation_matrix_between_vectors(self.navidget_node.Transform.value.get_translate(), self.intersection_geometry.Transform.value.get_translate())
-        if self.navidget_on == True:
-            _intersection_local = avango.gua.make_inverse_mat(self.navidget_node.Transform.value) * self.intersection_geometry.WorldTransform.value
+        _pick_result = self.NAVIGATION_MANAGER.pick_result
+        # if self.navidget_on == True:
+        if self.mode == 0:
+            self.navidget_node.Tags.value = ["invisible"]
+            print(self.mode)
+        elif self.mode == 1:
+            print(self.mode)
+            self.navidget_node.Transform.value = self.intersection_geometry.WorldTransform.value
+            self.navidget_node.Tags.value = []
 
+            if _pick_result == None:
+                return
+            elif _pick_result.Object.value != self.sphere_geometry:
+                return
+
+            _intersection_local = avango.gua.make_inverse_mat(self.navidget_node.Transform.value) * self.intersection_geometry.WorldTransform.value
             # self.navidget_target_pos = 
             # _intersection_local = avango.gua.make_inverse_mat(self.navidget_node.Transform.value) \
             #     * avango.gua.make_trans_mat(self.intersection_geometry.WorldTransform.value.get_translate())
             _vec1 = _intersection_local.get_translate()
-            _vec2 = self.navidget_node.Transform.value.get_translate()
-            _rot = self.get_rotation_matrix_between_vectors(_vec1, avango.gua.Vec3(0.0,0.0,0.0))
+            _vec2 = avango.gua.Vec3(0.0,0.0,1.0)
+            _rot = self.get_rotation_matrix_between_vectors(_vec2, _vec1)
 
             self.camera_transform.Transform.value = _intersection_local * _rot
+        # elif self.navidget_on == False:
+        elif self.mode == 2:
+            print(self.mode)
+            # self.navidget_start_pos = self.NAVIGATION_NODE.Transform.value.get_translate()
+            # self.navidget_target_pos = self.camera_transform.Transform.value.get_translate()
+            # _translation_anim = self.navidget_start_pos.lerp_to(self.navidget_target_pos, 0.1)
+            # print(_translation_anim)
 
-            # print(_intersection_local)
-            # print(self.intersection_geometry.WorldTransform.value)
-            # print(self.camera_transform.WorldTransform.value)
+            # self.navidget_start_quat = self.NAVIGATION_NODE.Transform.value.get_rotate()
+            # self.navidget_target_quat = self.camera_transform.Transform.value.get_rotate()
+            # _rotation_anim = self.navidget_start_quat.slerp_to(self.navidget_target_quat, 0.1)
+            # print(_rotation_anim)
 
+            # _tranformation_matrix = avango.gua.make_trans_mat(_translation_anim) * _rotation_anim
+            # print(_tranformation_matrix)
+            # self.mode = 0
+
+            # self.NAVIGATION_NODE.Transform.value = _tranformation_matrix
 
     @field_has_changed(sf_button)
     def sf_button_changed(self):
@@ -565,16 +570,16 @@ class NavidgetNavigation(NavigationTechnique):
             return
 
         ## ToDo: init Navidget behavior here
-        if self.sf_button.value:
-            self.navidget_on = True
-            self.navidget_node.Transform.value = self.intersection_geometry.WorldTransform.value
-            self.navidget_node.Tags.value = []
-            self.NAVIGATION_MANAGER.white_list = ["sphere"]
-            self.SCENEGRAPH.Root.value.town
-        else:
-            self.navidget_on = False
-            self.navidget_node.Tags.value = ["invisible"]
-            self.NAVIGATION_MANAGER.white_list = []
+        if self.mode == 0:
+            self.mode = 1
+            # self.navidget_node.Transform.value = self.intersection_geometry.WorldTransform.value
+            # self.navidget_node.Tags.value = []
+        elif self.mode == 1:
+            self.mode = 2
+        elif self.mode == 2:
+            self.mode = 0
+        #     self.navidget_node.Tags.value = ["invisible"]
+
 
 
                                       
