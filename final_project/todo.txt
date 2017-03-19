@@ -2,3 +2,20 @@ Leap Motion SDK with Python 3.5 in Linux (tutorial)
 https://community.leapmotion.com/t/leap-motion-sdk-with-python-3-5-in-linux-tutorial/5249
 
 https://github.com/kitchenbudapest/vr
+
+
+tar -xaf LeapDeveloperKit*31549*.tgz
+tar -xaf LeapDeveloperKit*33747*.tgz
+cd LeapDeveloperKit*33747*
+sudo dpkg -i Leap*x64.deb
+cd ../LeapDeveloperKit*31549*/LeapSDK
+mkdir python3.5_project
+cp -a lib/x64/libLeap.so lib/Leap.py samples/Sample.py python3.5_project/
+sudo apt-get install swig g++ libpython3.5-dev
+2to3-3.5 -nw python3.5_project/Sample.py
+wget http://tinyurl.com/leap-i-patch -O Leap.i.diff
+patch -p0 < Leap.i.diff
+swig -c++ -python -o /tmp/LeapPython.cpp -interface LeapPython include/Leap.i
+g++ -fPIC -I/usr/include/python3.5m -I./include /tmp/LeapPython.cpp lib/x64/libLeap.so -shared -o python3.5-project/LeapPython.so
+cd python3.5-project/
+LD_PRELOAD=./libLeap.so python3.5 Sample.py
