@@ -1,32 +1,64 @@
-import websocket
-import thread
-import time
+#!/usr/bin/env python
 
-def on_message(ws, message):
-    print message
+import asyncio
+import websockets
+import json
 
-def on_error(ws, error):
-    print error
+# @asyncio.coroutine
+# def hello():
+#     websocket = yield from websockets.connect('ws://localhost:6437/v6.json')
 
-def on_close(ws):
-    print "### closed ###"
+#     try:
+#         yield from websocket.send(json.dumps("{enableGestures: true}"))
+#         yield from websocket.send(json.dumps("{focused: true}"))
 
-def on_open(ws):
-    def run(*args):
-        for i in range(3):
-            time.sleep(1)
-            ws.send("Hello %d" % i)
-        time.sleep(1)
-        ws.close()
-        print "thread terminating..."
-    thread.start_new_thread(run, ())
+#         greeting = yield from websocket.recv()
+#         print(greeting)
+
+#     finally:
+#         yield from websocket.close()
+
+# @asyncio.coroutine
+# def handler(websocket):
+#     # msg = json.dumps("{enableGestures: true}")
+#     # websocket.send(msg)
+#     # msg = json.dumps("{focused: true}")
+#     # websocket.send(msg)
+
+#     while True:
+#         message = websocket.recv()
+#         result = json.loads(message)
+#         print(result)
+
+# @asyncio.coroutine
+# def main():
+#     websocket = yield from websockets.connect('ws://localhost:6437/v6.json')
+
+#     # Keep this process running until Enter is pressed
+#     print("Press Enter to quit...")
+#     try:
+#         while True:
+#             handler(websocket)
+#         # asyncio.get_event_loop().run_until_complete(handler())
+#         # asyncio.get_event_loop().run_forever()
+#     except KeyboardInterrupt:
+#         pass
+
+# if __name__ == "__main__":
+#     main()
 
 
-if __name__ == "__main__":
-    # websocket.enableTrace(True)
-    ws = websocket.WebSocketApp("http://127.0.0.1:6437",
-                              on_message = on_message,
-                              on_error = on_error,
-                              on_close = on_close)
-    ws.on_open = on_open
-    ws.run_forever()
+import asyncio
+import websockets
+
+@asyncio.coroutine
+def hello():
+    websocket = yield from websockets.connect('ws://localhost:6437/v6.json')
+    name = input("What's your name? ")
+    yield from websocket.send(name)
+    print("> {}".format(name))
+    greeting = yield from websocket.recv()
+    print("< {}".format(greeting))
+    yield from websocket.close()
+
+asyncio.get_event_loop().run_until_complete(hello())

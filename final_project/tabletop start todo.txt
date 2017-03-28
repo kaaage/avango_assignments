@@ -1,0 +1,36 @@
+Turn on tabletop display:
+
+art tracking
+
+white power switch (in the wall socket)
+
+medusa
+
+syncbox
+
+start projectors:
+/opt/3D43-TCP_CTRL/start3D43.sh
+
+genlock:
+/opt/client/dlp-tools/genlock_3_m6000.sh
+
+2d white power switch (video multiplexers)
+
+in web browser http://medusa.medien.uni-weimar.de/ "load color tables"
+
+/opt/3D43-TCP_CTRL/sendEnterToAll.sh
+
+start touch:
+plug in black cable labeled "IR LIGHT" behind the tabletop
+
+
+
+stop:
+/opt/3D43-TCP_CTRL/stop3D43.sh
+
+touch demo:
+/opt/vr_demos/mser_tracking/
+
+monkey demo:
+cd /opt/vr_demos/avango_applications_tabletop/
+./start.sh configs/medusa_touch.py
