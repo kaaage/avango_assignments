@@ -19,3 +19,30 @@ swig -c++ -python -o /tmp/LeapPython.cpp -interface LeapPython include/Leap.i
 g++ -fPIC -I/usr/include/python3.5m -I./include /tmp/LeapPython.cpp lib/x64/libLeap.so -shared -o python3.5-project/LeapPython.so
 cd python3.5-project/
 LD_PRELOAD=./libLeap.so python3.5 Sample.py
+
+
+
+### Project files structure:
+
+-tabletop display configuration - ViewingSetup.StereoViewingSetup
+-Leap sensor integration: daemon and device?
+-Scene
+-Navigation
+
+./
+    ./daemon.py
+    ./main.py
+    ./start.sh
+    ./lib
+        /Device.py
+        /LeapDevice.py?
+        /FPSGui.py
+        /GuaVE.py
+        /Scene.py
+        /Manipulation.py
+        /Navigation.py
+        ?/SimpleViewingSetup.py
+        /ViewingSetup.py
+            -StereoViewingSetup # Specify here the configuration of the tabletop display
+        /LeapSDK/
+            Leap.py

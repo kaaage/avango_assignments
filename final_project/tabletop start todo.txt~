@@ -32,5 +32,5 @@ touch demo:
 /opt/vr_demos/mser_tracking/
 
 monkey demo:
-cd /opt/vr_demos/avango-applications_tabletop/
+cd /opt/vr_demos/avango_applications_tabletop/
 ./start.sh configs/medusa_touch.py
