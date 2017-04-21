@@ -1,0 +1,1182 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"w",
+				"websockets"
+			],
+			[
+				"set",
+				"set_uniform"
+			],
+			[
+				"_col",
+				"_color_cube_geometry"
+			],
+			[
+				"se",
+				"self"
+			],
+			[
+				"ma",
+				"make_scale_mat"
+			],
+			[
+				"Par",
+				"PARENT_NODE"
+			],
+			[
+				"c",
+				"cube_nav_node"
+			],
+			[
+				"col",
+				"color_cube_scale_node"
+			],
+			[
+				"a",
+				"append"
+			],
+			[
+				"C",
+				"Children"
+			],
+			[
+				"P",
+				"PARENT_NODE"
+			],
+			[
+				"Tr",
+				"TriMeshLoader"
+			],
+			[
+				"EV",
+				"EV_REL"
+			],
+			[
+				"_s",
+				"_string2"
+			],
+			[
+				"get",
+				"get_geometry"
+			],
+			[
+				"scup",
+				"sculpture"
+			],
+			[
+				"get_",
+				"get_field"
+			],
+			[
+				"Sc",
+				"SculptureNavigation"
+			],
+			[
+				"init_",
+				"init_spacemouse"
+			],
+			[
+				"navigato",
+				"navigation_node"
+			],
+			[
+				"POINTER_",
+				"POINTER_DEVICE_STATION"
+			],
+			[
+				"navig",
+				"navigation_node"
+			],
+			[
+				"Manipu",
+				"ManipulationManager"
+			],
+			[
+				"clientSt",
+				"clientSetup2"
+			],
+			[
+				"client",
+				"client_ip"
+			],
+			[
+				"make",
+				"make_rot_mat"
+			],
+			[
+				"_tran",
+				"_tranformation_matrix"
+			],
+			[
+				"nav",
+				"navidget_start_quat"
+			],
+			[
+				"get_r",
+				"get_rotate"
+			],
+			[
+				"navi",
+				"navidget_target_pos"
+			],
+			[
+				"na",
+				"navidget_start_pos"
+			],
+			[
+				"came",
+				"camera_transform"
+			],
+			[
+				"NA",
+				"NAVIGATION_NODE"
+			],
+			[
+				"_ve",
+				"_vec2"
+			],
+			[
+				"pick",
+				"pick_result"
+			],
+			[
+				"NAVIG",
+				"NAVIGATION_NODE"
+			],
+			[
+				"NAVIGA",
+				"NAVIGATION_MANAGER"
+			],
+			[
+				"make_",
+				"make_rot_mat"
+			],
+			[
+				"sphe",
+				"sphere_geometry"
+			],
+			[
+				"whi",
+				"white_list"
+			],
+			[
+				"ca",
+				"camera_transform"
+			],
+			[
+				"navidget_s",
+				"navidget_start_pos"
+			],
+			[
+				"navg",
+				"navidget_target_pos"
+			],
+			[
+				"sphere",
+				"sphere_transform"
+			],
+			[
+				"camera",
+				"camera_transform"
+			],
+			[
+				"navid",
+				"navidget_node"
+			],
+			[
+				"Tran",
+				"TransformNode"
+			],
+			[
+				"naviget",
+				"naviget_node"
+			],
+			[
+				"navidget_",
+				"navidget_sphere_size"
+			],
+			[
+				"mode",
+				"mode_on"
+			],
+			[
+				"rot",
+				"rot_node"
+			],
+			[
+				"tra",
+				"translation_factor"
+			],
+			[
+				"_new",
+				"_new_trans_vec"
+			],
+			[
+				"_tra",
+				"_trans_vec"
+			],
+			[
+				"_rot",
+				"_rot_vec"
+			],
+			[
+				"_trans",
+				"_trans_vec"
+			],
+			[
+				"make_rt",
+				"make_rot_mat"
+			],
+			[
+				"NAVI",
+				"NAVIGATION_NODE"
+			],
+			[
+				"poin",
+				"pointer_node"
+			],
+			[
+				"Na",
+				"NAVIGATION_MANAGER"
+			],
+			[
+				"point",
+				"point_node"
+			],
+			[
+				"inter",
+				"intersection_geometry"
+			],
+			[
+				"_inter",
+				"_intersection_transform"
+			],
+			[
+				"_o",
+				"_oRot"
+			],
+			[
+				"new",
+				"newRot"
+			],
+			[
+				"ini",
+				"initial_translation"
+			],
+			[
+				"int",
+				"int"
+			],
+			[
+				"stre",
+				"streamNode2"
+			],
+			[
+				"cube",
+				"cube_node1"
+			],
+			[
+				"sta",
+				"started"
+			],
+			[
+				"to",
+				"total_dist"
+			],
+			[
+				"USER",
+				"USER1_ID"
+			],
+			[
+				"_",
+				"_user1_id"
+			],
+			[
+				"user",
+				"_user1_id"
+			],
+			[
+				"results",
+				"results_file"
+			],
+			[
+				"values",
+				"string_values"
+			],
+			[
+				"stat",
+				"station_name"
+			],
+			[
+				"init",
+				"initial_translation"
+			],
+			[
+				"y",
+				"y_offset"
+			],
+			[
+				"trans",
+				"trans_node"
+			],
+			[
+				"value",
+				"value_input"
+			],
+			[
+				"scale",
+				"scale_node"
+			],
+			[
+				"hand",
+				"hand_geometry"
+			],
+			[
+				"dragg",
+				"dragged_node"
+			],
+			[
+				"pointer",
+				"pointer_node"
+			],
+			[
+				"inner",
+				"inner01"
+			],
+			[
+				"Pointer",
+				"PointerEDNETViolet"
+			],
+			[
+				"sph",
+				"sphere_geometry"
+			],
+			[
+				"cylin",
+				"cylinder_geometry"
+			],
+			[
+				"cylinde",
+				"cylinder_transform"
+			],
+			[
+				"ground_",
+				"ground_geometry"
+			],
+			[
+				"Tra",
+				"Transform"
+			],
+			[
+				"_P",
+				"_pointer"
+			],
+			[
+				"EX",
+				"EXP_SPEED"
+			],
+			[
+				"exp",
+				"exp_speed"
+			],
+			[
+				"ex",
+				"exp_speed"
+			],
+			[
+				"part",
+				"part_geometry"
+			],
+			[
+				"objec",
+				"object_file"
+			],
+			[
+				"obe",
+				"object_file"
+			],
+			[
+				"par",
+				"part01"
+			],
+			[
+				"g",
+				"group1"
+			],
+			[
+				"engine",
+				"engine_root"
+			],
+			[
+				"groun",
+				"ground_geometry"
+			],
+			[
+				"eng",
+				"engine_root"
+			],
+			[
+				"hoo",
+				"hook_geometry"
+			],
+			[
+				"arm",
+				"arm_geometry"
+			],
+			[
+				"hinge",
+				"hinge_transform"
+			],
+			[
+				"hing",
+				"hinge_transform"
+			],
+			[
+				"hin",
+				"hinge1"
+			],
+			[
+				"he",
+				"HEIGHT"
+			],
+			[
+				"hinge_",
+				"hinge_geometry"
+			],
+			[
+				"hinge1",
+				"hinge1_transform_node"
+			],
+			[
+				"conn",
+				"connect_from"
+			],
+			[
+				"tranfrom",
+				"TransformNode"
+			],
+			[
+				"car",
+				"car_trans_node"
+			],
+			[
+				"bae",
+				"base_node"
+			],
+			[
+				"ROT",
+				"ROT_OFFSET_MAT"
+			],
+			[
+				"H",
+				"HEIGHT"
+			],
+			[
+				"base",
+				"base_node"
+			],
+			[
+				"orbit",
+				"orbit_inclination_node"
+			],
+			[
+				"axis",
+				"axis2_geometry"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "final_project/todo.txt",
+			"settings":
+			{
+				"buffer_size": 1435,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "mini-project/main.py",
+			"settings":
+			{
+				"buffer_size": 6367,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "final_project/tabletop multitouch resources.txt",
+			"settings":
+			{
+				"buffer_size": 2455,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "final_project/tabletop start todo.txt",
+			"settings":
+			{
+				"buffer_size": 605,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "mini-project/daemon.py",
+			"settings":
+			{
+				"buffer_size": 5857,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "mini-project/lib/MultiUserViewingSetup.py",
+			"settings":
+			{
+				"buffer_size": 11752,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "mini-project/lib/ViewingSetup.py",
+			"settings":
+			{
+				"buffer_size": 7457,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/home/liju1602/github/avango_assignments",
+		"/home/liju1602/github/avango_assignments/final_project",
+		"/home/liju1602/github/avango_assignments/mini-project",
+		"/home/liju1602/github/avango_assignments/mini-project/lib"
+	],
+	"file_history":
+	[
+		"/home/liju1602/github/avango_assignments/mini-project/lib/GuaVE.py",
+		"/home/liju1602/github/avango_assignments/mini-project/lib/Navigation.py",
+		"/home/liju1602/github/avango_assignments/mini-project/lib/Manipulation.py",
+		"/home/liju1602/github/avango_assignments/06_immersive_3D/main.py",
+		"/home/liju1602/github/avango_assignments/final_project/tabletop start todo.txt",
+		"/home/liju1602/github/avango_assignments/05_transfer_functions/daemon.py",
+		"/home/liju1602/github/avango_assignments/04_dragging/daemon.py",
+		"/home/liju1602/github/avango_assignments/final_project/tabletop multitouch resources.txt",
+		"/home/liju1602/github/avango_assignments/08_navigation/lib/Navigation.py",
+		"/home/liju1602/github/avango_assignments/mini-project/start.sh",
+		"/home/liju1602/github/avango_assignments/00_tutorial/start.sh",
+		"/home/liju1602/github/avango_assignments/final_project/main.py",
+		"/home/liju1602/github/avango_assignments/mini-project/lib/Scene.py",
+		"/home/liju1602/github/avango_assignments/final_project/links.txt",
+		"/home/liju1602/github/avango_assignments/08_navigation/lib/SimpleViewingSetup.py~",
+		"/home/liju1602/github/avango_assignments/mini-project/lib/ViewingSetup.py",
+		"/home/liju1602/github/avango_assignments/08_navigation/main.py",
+		"/home/liju1602/github/avango_assignments/08_navigation/lib/ViewingSetup.py",
+		"/home/liju1602/github/avango_assignments/final_project/LeapSDK/python3.5_project/Sample.py",
+		"/home/liju1602/github/avango_assignments/final_project/lib/SimpleViewingSetup.py~",
+		"/home/liju1602/github/avango_assignments/01_hierarchical_structuring/lib/Navigation.py",
+		"/home/liju1602/github/avango_assignments/03_crane/lib/SimpleViewingSetup.py",
+		"/home/liju1602/github/avango_assignments/final_project/lib/Leap.py",
+		"/home/liju1602/github/avango_assignments/final_project/LeapSDK/python3.5_project/Leap.py",
+		"/home/liju1602/github/avango_assignments/final_project/Sample2.py",
+		"/home/liju1602/github/avango_assignments/final_project/Sample.py",
+		"/home/liju1602/github/avango_assignments/final_project/LeapSDK/samples/JSONViewer.html",
+		"/home/liju1602/github/avango_assignments/final_project/todo.txt",
+		"/home/liju1602/github/avango_assignments/final_project/start.sh",
+		"/home/liju1602/github/avango_assignments/final_project/lib/Manipulation.py",
+		"/home/liju1602/github/avango_assignments/final_project/websocket.py",
+		"/home/liju1602/github/avango_assignments/final_project/daemon.py",
+		"/home/liju1602/github/avango_assignments/07_remote_manipulation/lib/Device.py",
+		"/home/liju1602/github/avango_assignments/07_remote_manipulation/daemon.py",
+		"/home/liju1602/github/avango_assignments/final_project/lib/Scene.py",
+		"/home/liju1602/github/avango_assignments/final_project/lib/Device.py",
+		"/home/liju1602/github/avango_assignments/final_project/lib/__init__.py",
+		"/home/liju1602/github/avango_assignments/final_project/LeapSDK/lib/Leap.py",
+		"/home/liju1602/github/lwa_demo/lib/Device.py",
+		"/home/liju1602/github/lwa_demo/client.py",
+		"/home/liju1602/github/bitesdemo/learning_with_avatars/server.py",
+		"/home/liju1602/github/bitesdemo/learning_with_avatars/client.py",
+		"/home/liju1602/github/bitesdemo/learning_with_avatars/lib/MultiUserViewingSetup.py",
+		"/home/liju1602/github/lwa_demo/lib/Sculpture.py",
+		"/home/liju1602/github/lwa_demo/server.py",
+		"/home/liju1602/github/lwa_demo/lib/MultiUserViewingSetup.py",
+		"/home/liju1602/github/lwa_demo/lib/SimpleViewingSetup.py",
+		"/home/liju1602/github/lwa_demo/daemon.py",
+		"/home/liju1602/github/lwa_demo/lib/utils.py",
+		"/home/liju1602/github/lwa_demo/lib/Manipulation.py",
+		"/home/liju1602/github/lwa_demo/lib/Navigation.py",
+		"/home/liju1602/github/bitesdemo/learning_with_avatars/lib/Device.py",
+		"/home/liju1602/github/bitesdemo/learning_with_avatars/daemon.py",
+		"/home/liju1602/github/lwa_demo/lib/Pointer.py",
+		"/home/liju1602/github/lwa_demo/lib/Scene.py",
+		"/home/liju1602/github/lwa_demo/lib/CoordinateSystem.py",
+		"/home/liju1602/github/lwa_demo/start_client.sh",
+		"/home/liju1602/github/lwa_demo/lib/PointerInput.py",
+		"/home/liju1602/github/lwa_demo/Manipulation.py",
+		"/home/liju1602/github/avango_assignments/08_navigation/lib/Scene.py",
+		"/home/liju1602/github/avango_assignments/08_navigation/lib/Navigation1.py",
+		"/usr/share/applications/debian-uxterm.desktop",
+		"/home/liju1602/github/avango_assignments/01_hierarchical_structuring/lib/SolarSystem.py",
+		"/home/liju1602/github/avango_assignments/08_navigation/lib/Manipulation.py",
+		"/home/liju1602/github/bitesdemo/learning_with_avatars/lib/Navigation.py",
+		"/home/liju1602/github/avango_assignments/07_remote_manipulation/lib/Manipulation.py",
+		"/home/liju1602/github/avango_assignments/03_crane/lib/FPSGui.py",
+		"/home/liju1602/github/avango_assignments/03_crane/daemon.py",
+		"/home/liju1602/github/avango_assignments/03_crane/main.py",
+		"/home/liju1602/github/avango_assignments/03_crane/lib/KeyboardInput.py",
+		"/home/liju1602/github/avango_assignments/03_crane/lib/Scene.py",
+		"/home/liju1602/github/avango_assignments/07_remote_manipulation/lib/Navigation.py",
+		"/home/liju1602/github/learning_with_avatars/lib/Navigation.py",
+		"/home/liju1602/github/learning_with_avatars/lib/Device.py",
+		"/home/liju1602/github/learning_with_avatars/lib/Scene.py",
+		"/home/liju1602/github/learning_with_avatars/client.py",
+		"/home/liju1602/github/learning_with_avatars/daemon.py",
+		"/home/liju1602/github/learning_with_avatars/server.py",
+		"/home/liju1602/github/avango_assignments/07_remote_manipulation/lib/ViewingSetup.py",
+		"/home/liju1602/github/avango_assignments/06_immersive_3D/lib/Manipulation.py~",
+		"/home/liju1602/github/avango_assignments/02_events_&_dataflow/lib/Intersection.py",
+		"/home/liju1602/github/avango_assignments/07_remote_manipulation/lib/Manipulation.py~",
+		"/home/liju1602/github/learning_with_avatars/lib/PointerInput.py",
+		"/home/liju1602/github/learning_with_avatars/lib/Pointer.py",
+		"/home/liju1602/github/avango_assignments/04_dragging/lib/Manipulation.py",
+		"/home/liju1602/github/avango_assignments/03_crane/lib/Crane.py",
+		"/home/liju1602/github/avango_assignments/03_crane/lib/Hook.py",
+		"/home/liju1602/github/avango_assignments/04_dragging/main.py",
+		"/home/liju1602/github/avango_assignments/05_transfer_functions/lib/Manipulation.py",
+		"/home/liju1602/github/avango_assignments/05_transfer_functions/lib/Navigation.py",
+		"/home/liju1602/my_avango/engine/lib/Scene.py",
+		"/home/liju1602/my_avango/engine/lib/Part.py",
+		"/home/liju1602/my_avango/engine/daemon.py",
+		"/home/liju1602/my_avango/engine/lib/Device.py",
+		"/home/liju1602/git/avango-telepresence/daemon.py",
+		"/home/liju1602/git/avango-telepresence/lib/SpheronInput.py",
+		"/home/liju1602/github/learning_with_avatars/start_server.sh",
+		"/home/liju1602/github/learning_with_avatars/lib/SpheronInput.py",
+		"/home/liju1602/github/learning_with_avatars/lib/utils.py",
+		"/home/liju1602/github/avango_assignments/03_crane/lib/Hinge.py",
+		"/home/liju1602/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
+		"/home/liju1602/.config/sublime-text-3/Packages/Default/Preferences.sublime-settings",
+		"/home/liju1602/my_avango/engine/lib/Manipulation.py",
+		"/home/liju1602/github/avango_assignments/03_crane/lib/Arm.py",
+		"/home/liju1602/my_avango/engine/lib/Navigation.py",
+		"/home/liju1602/github/avango_assignments/05_transfer_functions/main.py",
+		"/home/liju1602/github/avango_assignments/03_crane/start.sh",
+		"/home/liju1602/github/learning_with_avatars/lib/SimpleViewingSetup.py",
+		"/home/liju1602/github/learning_with_avatars/lib/KeyboardMouseInput.py~",
+		"/home/liju1602/github/learning_with_avatars/start_client.sh",
+		"/home/liju1602/github/avango_assignments/00_tutorial/tutorial-result/main.py",
+		"/home/liju1602/github/avango_assignments/01_hierarchical_structuring/main.py",
+		"/home/liju1602/github/avango_assignments/02_events_&_dataflow/main.py",
+		"/home/liju1602/github/avango_assignments/02_events_&_dataflow/lib/Scene.py",
+		"/home/liju1602/github/avango_assignments/02_events_&_dataflow/lib/Avatar.py",
+		"/home/liju1602/github/avango_assignments/00_tutorial/main.py",
+		"/home/liju1602/github/avango_assignments/00_tutorial/tutorial-result/SimpleViewer.py",
+		"/home/liju1602/git/avango-telepresence/lib/Navigation.py",
+		"/home/liju1602/git/avango-telepresence/lib/KeyboardMouseInput.py~",
+		"/home/liju1602/git/avango-telepresence/client.py",
+		"/home/liju1602/.config/sublime-text-3/Packages/Default/Default (Linux).sublime-keymap",
+		"/home/liju1602/.config/sublime-text-3/Packages/User/Default (Linux).sublime-keymap",
+		"/home/liju1602/my_avango/01_hierarchical_structuring/lib/SolarSystem.py",
+		"/home/liju1602/my_avango/01_hierarchical_structuring/main.py",
+		"/home/liju1602/my_avango/01_hierarchical_structuring/lib/SimpleViewingSetup.py",
+		"/home/liju1602/my_avango/01_hierarchical_structuring/lib/Device.py",
+		"/home/liju1602/my_avango/01_hierarchical_structuring/lib/Navigation.py",
+		"/opt/avango/master/examples/simple_example/main.py"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 93.0,
+		"where_history":
+		[
+			"/home/liju1602/github/lwa_demo",
+			"/home/liju1602/github/avango_assignments",
+			"/home/liju1602/github/learning_with_avatars",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": true,
+		"find_history":
+		[
+			"STEREO_MODE",
+			"stereo",
+			"SCREEN_MATRIX",
+			"STEREO_MODE",
+			"print",
+			"daemon",
+			"disp",
+			"print",
+			"avango",
+			"SF",
+			"get_ro",
+			"pointer_node",
+			"TRACKING_TRANSMITTER_OFFSET",
+			"spacemouseInput",
+			"sf_button1",
+			"self.scene",
+			"head_node",
+			"START_POSITION",
+			"head_node",
+			"tracking-dlp-glasses-3",
+			"intersection_geometry",
+			"name_to_ip",
+			"simple_cl",
+			"manipulation",
+			"Manipulation",
+			"pointer_device_sensor",
+			"HEAD_NODE",
+			"navigation_node",
+			"Client",
+			"ManipulationTechnique",
+			"black_list",
+			"print",
+			"naviget",
+			"navidgetSphere",
+			"navidget",
+			"_trans_vec",
+			"ray_geometry",
+			"intersection",
+			"offset",
+			"NAVIGATION_NODE",
+			"_ox",
+			"make_rot",
+			"offset",
+			"_navRot",
+			"_oRot",
+			"NAVIGATION_NODE",
+			"_distance",
+			"ray_length",
+			"get_orbit_node",
+			"orbit_radius_node",
+			"update_orbit",
+			"length",
+			"()))\n",
+			"elem",
+			"init_griffin",
+			"0.0",
+			"result",
+			"delta_z",
+			"i_scale",
+			"scale",
+			"get_scale",
+			"get_sca",
+			"tmpdist",
+			"color_list",
+			"spheron",
+			"get_rotate",
+			"get_translate",
+			"rotation",
+			"cube_geometry",
+			"cube_transform",
+			"tracking-lcd-prop-1",
+			"SteeringNavigation",
+			"gua-device-spheron",
+			"\t",
+			"MF_BUTTONS",
+			"SERVER",
+			"get_orbit_node",
+			"scale",
+			"avatar",
+			"SFInt",
+			"_values",
+			"GuaVe",
+			"ABS_Y",
+			"ABS",
+			"INPUT_DEVICE",
+			"sidebar"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"host_ips",
+			"sphere"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 3,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "final_project/todo.txt",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1435,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1435,
+								1435
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "mini-project/main.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6367,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4499,
+								4499
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 509.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "final_project/tabletop multitouch resources.txt",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2455,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								93,
+								93
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "final_project/tabletop start todo.txt",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 605,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								436,
+								436
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "mini-project/daemon.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5857,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								321,
+								321
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 5,
+					"file": "mini-project/lib/MultiUserViewingSetup.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 11752,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								6959,
+								6959
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1929.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "mini-project/lib/ViewingSetup.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7457,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 25.0
+	},
+	"input":
+	{
+		"height": 33.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			0.426010129119,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "avango_assignments.sublime-project",
+	"replace":
+	{
+		"height": 46.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"start",
+				"00_tutorial/start.sh"
+			],
+			[
+				"navigation",
+				"01_hierarchical_structuring/lib/Navigation.py"
+			],
+			[
+				"cli",
+				"client.py"
+			],
+			[
+				"scene",
+				"lib/Scene.py"
+			],
+			[
+				"ser",
+				"server.py"
+			],
+			[
+				"sr",
+				"avango-telepresence/server.py"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 1,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 314.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

@@ -30,7 +30,7 @@ def start():
         
     steeringNavigation = SteeringNavigation()
     steeringNavigation.my_constructor(deviceInput.mf_dof, deviceInput.mf_buttons, 0.15, 1.0) # connect navigation with spacemouse input
-    steeringNavigation.set_start_matrix(avango.gua.make_trans_mat(0.0,0.0,0.0))
+    steeringNavigation.set_start_matrix(avango.gua.make_trans_mat(-2.1, 0.96, 0.705))
 
     ## init viewing setup
     ## init viewing and interaction setups
@@ -41,7 +41,7 @@ def start():
 
 
     if hostname == "medusa": # Samsung 3D-TV workstation
-        _tracking_transmitter_offset = avango.gua.make_trans_mat(-2.1, 0.96, 0.705) * avango.gua.make_rot_mat(90.0, 0, 1, 0) * avango.gua.make_rot_mat(90.0, -1, 0, 0) # transformation into tracking coordinate system
+        # _tracking_transmitter_offset = avango.gua.make_trans_mat(-2.1, 0.96, 0.705) * avango.gua.make_rot_mat(90.0, 0, 1, 0) * avango.gua.make_rot_mat(90.0, -1, 0, 0) # transformation into tracking coordinate system
 
         # viewingSetup = StereoViewingSetup(
         #     SCENEGRAPH = scenegraph,
@@ -69,7 +69,7 @@ def start():
             WINDOW_RESOLUTION = avango.gua.Vec2ui(1400, 1050),
             SCREEN_DIMENSIONS = avango.gua.Vec2(1.135, 0.85),
             SCREEN_MATRIX = avango.gua.make_trans_mat(-2.1, 0.96, 0.705) * avango.gua.make_rot_mat(90.0, 0, 1, 0) * avango.gua.make_rot_mat(90.0, -1, 0, 0),
-            TRACKING_TRANSMITTER_OFFSET = _tracking_transmitter_offset,
+            # TRACKING_TRANSMITTER_OFFSET = _tracking_transmitter_offset,
             LEFT_POSITION = avango.gua.Vec2ui(0, 0),
             LEFT_RESOLUTION = avango.gua.Vec2ui(1400, 1050),
             RIGHT_POSITION = avango.gua.Vec2ui(1400, 0),
@@ -92,8 +92,8 @@ def start():
             )
 
         viewingSetup.init_user(HEADTRACKING_SENSOR_STATION = "tracking-dlp-glasses-1")
-        viewingSetup.init_user(HEADTRACKING_SENSOR_STATION = "tracking-dlp-glasses-3")
         viewingSetup.init_user(HEADTRACKING_SENSOR_STATION = "tracking-dlp-glasses-2")
+        viewingSetup.init_user(HEADTRACKING_SENSOR_STATION = "tracking-dlp-glasses-3")
 
         # manipulationManager = ManipulationManager()
         # manipulationManager.my_constructor(

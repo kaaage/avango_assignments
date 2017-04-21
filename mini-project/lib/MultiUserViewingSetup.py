@@ -21,15 +21,15 @@ class User:
         NAVIGATION_NODE = None,
         SCREEN_NODE = None,
         DISPLAY_STRING = ":0.0",
-        WINDOW_RESOLUTION = avango.gua.Vec2ui(1920, 1200), # default resolution in pixel
-        SCREEN_DIMENSIONS = avango.gua.Vec2(4.2, 2.61), # default screen size in meter
+        WINDOW_RESOLUTION = avango.gua.Vec2ui(1400, 1050), # default resolution in pixel
+        SCREEN_DIMENSIONS = avango.gua.Vec2(1.135, 0.85), # default screen size in meter
         SCREEN_MATRIX = avango.gua.make_identity_mat(),
         HEADTRACKING_SENSOR_STATION = "",
         TRACKING_TRANSMITTER_OFFSET = avango.gua.make_identity_mat(),
         LEFT_POSITION = avango.gua.Vec2ui(0, 0),
-        LEFT_RESOLUTION = avango.gua.Vec2ui(1920, 1200),
-        RIGHT_POSITION = avango.gua.Vec2ui(1920, 0),
-        RIGHT_RESOLUTION = avango.gua.Vec2ui(1920, 1200),
+        LEFT_RESOLUTION = avango.gua.Vec2ui(1400, 1050),
+        RIGHT_POSITION = avango.gua.Vec2ui(1400, 0),
+        RIGHT_RESOLUTION = avango.gua.Vec2ui(1400, 1050),
         WARP_MATRIX_RED_RIGHT = "",
         WARP_MATRIX_GREEN_RIGHT = "",
         WARP_MATRIX_BLUE_RIGHT = "",
@@ -63,7 +63,7 @@ class User:
         ## init window
         self.window = avango.gua.nodes.Window(Title = "window" + str(self.id))
         self.window.Display.value = DISPLAY_STRING
-        self.window.EnableVsync.value = True
+        self.window.EnableVsync.value = False
         #self.window.EnableFullscreen.value = True
         self.window.Size.value = avango.gua.Vec2ui(WINDOW_RESOLUTION.x*2, WINDOW_RESOLUTION.y)
         self.window.StereoMode.value = avango.gua.StereoMode.SIDE_BY_SIDE
@@ -156,12 +156,6 @@ class User:
         if WARP_MATRIX_BLUE_LEFT != "":
             self.window.WarpMatrixBlueLeft.value = WARP_MATRIX_BLUE_LEFT
 
-        if HEADTRACKING_SENSOR_STATION == 'tracking-dlp-videoCam':
-            self.set_eye_distance(0.0)
-        else:
-            self.set_eye_distance(0.064)
-
-
 
     ### functions ###
     def set_eye_distance(self, FLOAT):
@@ -174,14 +168,14 @@ class MultiUserViewingSetup:
     ### constructor
     def __init__(self,
         SCENEGRAPH = None,
-        WINDOW_RESOLUTION = avango.gua.Vec2ui(1920, 1200), # default resolution in pixel
-        SCREEN_DIMENSIONS = avango.gua.Vec2(4.2, 2.61), # default screen size in meter
+        WINDOW_RESOLUTION = avango.gua.Vec2ui(1400, 1050), # default resolution in pixel
+        SCREEN_DIMENSIONS = avango.gua.Vec2(1.135, 0.85), # default screen size in meter
         SCREEN_MATRIX = avango.gua.make_identity_mat(),
         TRACKING_TRANSMITTER_OFFSET = avango.gua.make_identity_mat(),
         LEFT_POSITION = avango.gua.Vec2ui(0, 0),
-        LEFT_RESOLUTION = avango.gua.Vec2ui(1920, 1200),
-        RIGHT_POSITION = avango.gua.Vec2ui(1920, 0),
-        RIGHT_RESOLUTION = avango.gua.Vec2ui(1920, 1200),
+        LEFT_RESOLUTION = avango.gua.Vec2ui(1400, 1050),
+        RIGHT_POSITION = avango.gua.Vec2ui(1400, 0),
+        RIGHT_RESOLUTION = avango.gua.Vec2ui(1400, 1050),
         DISPLAY_STRING_LIST = [":0.0"],
         WARP_MATRIX_RED_RIGHT = "",
         WARP_MATRIX_GREEN_RIGHT = "",
