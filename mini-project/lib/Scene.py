@@ -6,9 +6,8 @@ import avango.gua
 import avango.script
 from avango.script import field_has_changed
 
-### import python libraries
-
-
+### import application libraries
+from lib.LeapSensor import LeapSensor
 
 class SceneScript(avango.script.Script):
 
@@ -83,11 +82,15 @@ class Scene:
         PARENT_NODE.Children.value.append(self.base_node)
 
         self.cube_node = avango.gua.nodes.TransformNode(Name="cube_node")
-        self.cube_node.Transform.value = avango.gua.make_trans_mat(0.0, 0.0, 0.0) * avango.gua.make_scale_mat(0.15,0.15,0.15)
+        self.cube_node.Transform.value = avango.gua.make_trans_mat(0.0, 0.0, 0.0) * avango.gua.make_scale_mat(0.05,0.05,0.05)
         self.cube = _loader.create_geometry_from_file("cube", "data/objects/cube.obj", avango.gua.LoaderFlags.DEFAULTS)
         self.cube.Material.value.set_uniform("Color", avango.gua.Vec4(1.0, 0.0, 0.0, 1.0))
         self.cube_node.Children.value.append(self.cube)
         self.base_node.Children.value.append(self.cube_node)
+
+        leap = LeapSensor()
+        leap.my_constructor()
+        self.cube_node.Transform.connect_from(leap.sf_mat)
 
         # ground
         # self.ground = _loader.create_geometry_from_file("ground", "data/objects/cube.obj", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.LOAD_MATERIALS)

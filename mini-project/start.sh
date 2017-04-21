@@ -9,6 +9,7 @@ AVANGO=/opt/avango/master
 
 # third party libs
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/boost/current/lib:/opt/zmq/current/lib:/opt/Awesomium/lib
+#/usr/local/lib
 
 # schism
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/schism/current/lib/linux_x86
@@ -19,7 +20,7 @@ export PYTHONPATH=$AVANGO/lib/python3.4
 
 # guacamole
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$GUACAMOLE/lib
-
+export LD_PRELOAD=./leap/libLeap.so
 
 # run daemon
 python3 ./daemon.py > /dev/null &
