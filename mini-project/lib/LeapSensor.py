@@ -23,25 +23,54 @@ class LeapSensor(avango.script.Script):
 
     sf_mat = avango.gua.SFMatrix4()
 
+    pinch_threshold = 0.7
+
+    handright_pinch_strength = 0
+    handleft_pinch_strength = 0
+
+    handright_pos = avango.gua.SFMatrix4()
+    handright_index_pos = avango.gua.SFMatrix4()
+    handright_thumb_pos = avango.gua.SFMatrix4()
+
+    handleft_pos = avango.gua.SFMatrix4()
+    handleft_index_pos = avango.gua.SFMatrix4()
+    handleft_thumb_pos = avango.gua.SFMatrix4()
+
+    cube_picked = None
+
     def __init__(self):
         self.super(LeapSensor).__init__()
 
     def my_constructor(self,
         # SCENE = None,
-        # SCENEGRAPH = None,
+        SCENEGRAPH = None,
         # NAVIGATION_NODE = None,
         TRACKING_TRANSMITTER_OFFSET = avango.gua.make_identity_mat(),
         ):
-
-        # self.SCENEGRAPH = SCENEGRAPH
+        self.SCENEGRAPH = SCENEGRAPH
         # self.SCENE = SCENE
 
-        ## Init Leap Motion
+        ### Picking ###
+
+        self.pick_result = None
+        self.picked_object = None
+
+        self.white_list = []
+        self.black_list = ["invisible"]
+
+        self.pick_options = avango.gua.PickingOptions.PICK_ONLY_FIRST_OBJECT \
+                            | avango.gua.PickingOptions.GET_POSITIONS \
+                            | avango.gua.PickingOptions.GET_NORMALS \
+                            | avango.gua.PickingOptions.GET_WORLD_POSITIONS \
+                            | avango.gua.PickingOptions.GET_WORLD_NORMALS
+
+        self.ray = avango.gua.nodes.Ray() # required for trimesh intersection
+
+        ### Init Leap Motion ###
 
         # Create a sample listener and controller
         self.listener = SampleListener()
         self.controller = leap.Leap.Controller()
-
         # Have the sample listener receive events from the controller
         self.controller.add_listener(self.listener)
 
@@ -58,22 +87,54 @@ class LeapSensor(avango.script.Script):
         self.always_evaluate(True) # change global evaluation policy
 
     def evaluate(self):
-        ## calc ray intersections
-        # _mf_pick_result = self.calc_pick_result(PICK_MAT = self.pointer_node.WorldTransform.value, PICK_LENGTH = self.ray_length)
         frame = self.controller.frame()
         # print("Frame id: %d, timestamp: %d, hands: %d, fingers: %d, tools: %d, gestures: %d" % (
         #       frame.id, frame.timestamp, len(frame.hands), len(frame.fingers), len(frame.tools), len(frame.gestures())))
 
-        hand_left = frame.hands.leftmost
-        hand_right = frame.hands.rightmost
-        index_finger_list = hand_right.fingers.finger_type(Finger.TYPE_INDEX)
-        index_finger = index_finger_list[0]
-        pos = index_finger.tip_position
-        rot = index_finger.direction
+        # hand_left = frame.hands.leftmost
+        # hand_right = frame.hands.rightmost
+        # index_finger_list = hand_right.fingers.finger_type(Finger.TYPE_INDEX)
+        # index_finger = index_finger_list[0]
+
+        self.handright_index_pos.value = get_leap_trans_mat(frame.hands.rightmost.fingers.finger_type(Finger.TYPE_INDEX)[0].tip_position)
+        self.handright_thumb_pos.value = get_leap_trans_mat(frame.hands.rightmost.fingers.finger_type(Finger.TYPE_THUMB)[0].tip_position)
+
+        self.handleft_index_pos.value = get_leap_trans_mat(frame.hands.leftmost.fingers.finger_type(Finger.TYPE_INDEX)[0].tip_position)
+        self.handleft_thumb_pos.value = get_leap_trans_mat(frame.hands.leftmost.fingers.finger_type(Finger.TYPE_THUMB)[0].tip_position)
+
+        self.handright_pinch_strength = frame.hands.rightmost.pinch_strength
+        self.handleft_pinch_strength = frame.hands.leftmost.pinch_strength
+
+        ## calc intersections - picked cubes
+        _mf_handright_pick_result = self.calc_pick_result(PICK_MAT = self.handright_thumb_pos.value, PICK_LENGTH = 0.05)
+        _mf_handleft_pick_result = self.calc_pick_result(PICK_MAT = self.handleft_thumb_pos.value, PICK_LENGTH = 0.05)
+
+        ### todo: calculate cube position offset
         offset_mat = avango.gua.make_trans_mat(0.0,0.0,0.425)
-        # print(pos.x, pos.y, pos.z)
-        mat = avango.gua.make_trans_mat(avango.gua.Vec3(pos.x / 1000, pos.y / 1000, pos.z / 1000)) * avango.gua.make_scale_mat(0.05,0.05,0.05)
-        self.sf_mat.value = mat
+
+        # rot = index_finger.direction
+        # This should be the quaternion rotation of -45 euler around x ( avango.gua.make_rot_mat( 0.92388,-0.38268,0,0) )
+        # mat = avango.gua.make_trans_mat(avango.gua.Vec3(pos.x / 1000 , (-pos.z / 1000)-0.425, (pos.y / 1000))) * avango.gua.make_scale_mat(0.05,0.05,0.05)
+        # print("x "+ str(pos.x) +"\ty "+ str(pos.y) +"\tz "+ str(pos.z))
+        # self.sf_mat.value = mat
+
+    def calc_pick_result(self, PICK_MAT = avango.gua.make_identity_mat(), PICK_LENGTH = 1.0):
+        # update ray parameters
+        self.ray.Origin.value = PICK_MAT.get_translate()
+
+        _vec = avango.gua.make_rot_mat(PICK_MAT.get_rotate_scale_corrected()) * avango.gua.Vec3(0.0,0.0,-1.0)
+        _vec = avango.gua.Vec3(_vec.x,_vec.y,_vec.z)
+
+        self.ray.Direction.value = _vec * PICK_LENGTH
+
+        # intersect
+        # _mf_pick_result = self.SCENEGRAPH.ray_test(self.ray, self.pick_options, self.white_list, self.black_list)
+        _mf_pick_result = None
+
+        return _mf_pick_result
+
+def get_leap_trans_mat(pos):
+    return avango.gua.make_trans_mat(avango.gua.Vec3(pos.x / 1000 , (-pos.z / 1000)-0.425, (pos.y / 1000))) * avango.gua.make_scale_mat(0.05,0.05,0.05)
 
 
 class SampleListener(leap.Leap.Listener):

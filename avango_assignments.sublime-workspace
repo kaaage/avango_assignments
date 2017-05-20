@@ -4,6 +4,38 @@
 		"selected_items":
 		[
 			[
+				"make",
+				"make_identity_mat"
+			],
+			[
+				"Tran",
+				"Transform"
+			],
+			[
+				"index",
+				"index_finger"
+			],
+			[
+				"scene",
+				"scenegraph"
+			],
+			[
+				"SCENE",
+				"SCENEGRAPH"
+			],
+			[
+				"SCE",
+				"SCENEGRAPH"
+			],
+			[
+				"sc",
+				"scene"
+			],
+			[
+				"Tra",
+				"TransformNode"
+			],
+			[
 				"w",
 				"websockets"
 			],
@@ -104,10 +136,6 @@
 				"client_ip"
 			],
 			[
-				"make",
-				"make_rot_mat"
-			],
-			[
 				"_tran",
 				"_tranformation_matrix"
 			],
@@ -186,10 +214,6 @@
 			[
 				"navid",
 				"navidget_node"
-			],
-			[
-				"Tran",
-				"TransformNode"
 			],
 			[
 				"naviget",
@@ -368,10 +392,6 @@
 				"ground_geometry"
 			],
 			[
-				"Tra",
-				"Transform"
-			],
-			[
 				"_P",
 				"_pointer"
 			],
@@ -501,27 +521,11 @@
 			}
 		},
 		{
-			"file": "mini-project/main.py",
+			"file": "mini-project/start.sh",
 			"settings":
 			{
-				"buffer_size": 6367,
+				"buffer_size": 753,
 				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "final_project/tabletop multitouch resources.txt",
-			"settings":
-			{
-				"buffer_size": 2455,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "final_project/tabletop start todo.txt",
-			"settings":
-			{
-				"buffer_size": 605,
 				"line_ending": "Unix"
 			}
 		},
@@ -535,19 +539,40 @@
 			}
 		},
 		{
-			"file": "mini-project/lib/MultiUserViewingSetup.py",
+			"file": "mini-project/lib/LeapSensor.py",
 			"settings":
 			{
-				"buffer_size": 11752,
+				"buffer_size": 8460,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "mini-project/lib/ViewingSetup.py",
+			"file": "mini-project/main.py",
 			"settings":
 			{
-				"buffer_size": 7457,
+				"buffer_size": 4794,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "mini-project/leap/Sample.py",
+			"settings":
+			{
+				"buffer_size": 6721,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "#!/usr/bin/python\n\n### import guacamole libraries\nimport avango\nimport avango.gua\nimport avango.script\nfrom avango.script import field_has_changed\n\n### import application libraries\nfrom lib.LeapSensor import LeapSensor\n\nclass SceneScript(avango.script.Script):\n\n    ## input fields\n    sf_reset_button = avango.SFBool()\n\n    ## Default constructor.\n    def __init__(self):\n        self.super(SceneScript).__init__()\n\n        ### external references ###\n        self.CLASS = None # is set later\n        \n\n        ### resources ###\n        self.keyboard_device_sensor = avango.daemon.nodes.DeviceSensor(DeviceService = avango.daemon.DeviceService())\n        self.keyboard_device_sensor.Station.value = \"gua-device-keyboard0\"\n\n        self.sf_reset_button.connect_from(self.keyboard_device_sensor.Button14) # spacebar key\n\n\n    def my_constructor(self, CLASS):\n        self.CLASS = CLASS\n\n\n    ### callbacks ###  \n    @field_has_changed(sf_reset_button)\n    def sf_reset_button_changed(self):\n        if self.sf_reset_button.value == True and self.CLASS is not None: # button pressed\n            self.CLASS.reset()\n            \n\n\nclass Scene:\n\n    ## constructor\n    def __init__(self,\n        PARENT_NODE = None,\n        ):\n\n\n        ### external reference ###\n        self.PARENT_NODE = PARENT_NODE\n\n        ### resources ###                \n        self.script = SceneScript()\n        self.script.my_constructor(self)\n\n\n        ## init scene light\n        self.scene_light = avango.gua.nodes.LightNode(Name = \"scene_light\")\n        self.scene_light.Type.value = avango.gua.LightType.SPOT\n        self.scene_light.Color.value = avango.gua.Color(1.0,1.0,0.8)\n        self.scene_light.Brightness.value = 20.0\n        self.scene_light.Falloff.value = 0.1 # exponent\n        self.scene_light.EnableShadows.value = True\n        self.scene_light.ShadowMapSize.value = 2048\n        self.scene_light.ShadowOffset.value = 0.001\n        self.scene_light.ShadowNearClippingInSunDirection.value = 0.1 * (1.0/4.0)\n        self.scene_light.ShadowMaxDistance.value = 10.0 # maximal distance, the shadow is visible\n        self.scene_light.ShadowNearClippingInSunDirection.value = 0.05\n        self.scene_light.Transform.value = avango.gua.make_trans_mat(0.0,1.2,0.5) * \\\n            avango.gua.make_rot_mat(80.0,-1,0,0) * \\\n            avango.gua.make_scale_mat(3.0)\n        PARENT_NODE.Children.value.append(self.scene_light)\n\n        ## init scene geometries\n        _loader = avango.gua.nodes.TriMeshLoader() # get trimesh loader to load external meshes\n\n        self.base_node = avango.gua.nodes.TransformNode(Name=\"base_node\")\n        self.base_node.Transform.value = avango.gua.make_trans_mat(-2.1, 0.96, 0.705) * avango.gua.make_rot_mat(90.0, 0, 1, 0) * avango.gua.make_rot_mat(90.0, -1, 0, 0)\n        PARENT_NODE.Children.value.append(self.base_node)\n\n        self.cube_node = avango.gua.nodes.TransformNode(Name=\"cube_node\")\n        self.cube_node.Transform.value = avango.gua.make_trans_mat(0.0, 0.0, 0.0) * avango.gua.make_scale_mat(0.05,0.05,0.05)\n        self.cube = _loader.create_geometry_from_file(\"cube\", \"data/objects/cube.obj\", avango.gua.LoaderFlags.DEFAULTS)\n        self.cube.Material.value.set_uniform(\"Color\", avango.gua.Vec4(1.0, 0.0, 0.0, 1.0))\n        self.cube_node.Children.value.append(self.cube)\n        self.base_node.Children.value.append(self.cube_node)\n\n\n        self.cube_node_static = avango.gua.nodes.TransformNode(Name=\"cube_node_static\")\n        self.cube_node_static.Transform.value = avango.gua.make_trans_mat(0.0, 0.0, 0.0) * avango.gua.make_scale_mat(0.05,0.05,0.05)\n        self.cube_static = _loader.create_geometry_from_file(\"cube\", \"data/objects/cube.obj\", avango.gua.LoaderFlags.DEFAULTS)\n        self.cube.Material.value.set_uniform(\"Color\", avango.gua.Vec4(1.0, 0.0, 0.0, 1.0))\n        self.cube_node_static.Children.value.append(self.cube_static)\n        self.base_node.Children.value.append(self.cube_node_static)\n\n\n        leap = LeapSensor()\n        leap.my_constructor()\n        self.cube_node.Transform.connect_from(leap.sf_mat)\n\n        # ground table\n        self.ground = _loader.create_geometry_from_file(\"ground\", \"data/objects/cube.obj\", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.LOAD_MATERIALS)\n        self.ground.Transform.value = avango.gua.make_trans_mat(0.0,-0.17,0.0) * \\\n            avango.gua.make_scale_mat(1.0,0.005,1.0)\n        self.ground.Material.value.set_uniform(\"Color\", avango.gua.Vec4(0.7,0.7,1.0,1.0))\n        self.ground.Material.value.set_uniform(\"Emissivity\", 0.5)\n        self.ground.Material.value.set_uniform(\"Metalness\", 0.1)\n        self.ground.add_and_init_field(avango.gua.SFMatrix4(), \"HomeMatrix\", self.ground.Transform.value)\n        self.base_node.Children.value.append(self.ground)\n        PARENT_NODE.Children.value.append(self.ground)\n\n\n        # table\n        # self.table = _loader.create_geometry_from_file(\"table\", \"/opt/3d_models/Jacobs_Models/table_ikea/table_ikea.obj\", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.LOAD_MATERIALS | avango.gua.LoaderFlags.MAKE_PICKABLE)\n        # self.table.Transform.value = avango.gua.make_trans_mat(0.0, -0.17, 0.0) * \\\n        #     avango.gua.make_rot_mat(90.0,-1,0,0) * \\\n        #     avango.gua.make_scale_mat(0.0003)\n        # self.table.add_and_init_field(avango.gua.SFMatrix4(), \"HomeMatrix\", self.table.Transform.value)\n        # PARENT_NODE.Children.value.append(self.table)\n        \n\n        # notebook\n        # self.notebook = _loader.create_geometry_from_file(\"notebook\", \"/opt/3d_models/Jacobs_Models/notebook/notebook.obj\", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.LOAD_MATERIALS | avango.gua.LoaderFlags.MAKE_PICKABLE)\n        # self.notebook.Transform.value = avango.gua.make_trans_mat(-2.1, 0.96, 0.705) * \\\n        #     avango.gua.make_rot_mat(90.0,-1,0,0) * \\\n        #     avango.gua.make_rot_mat(10.0,0,0,-1) * \\\n        #     avango.gua.make_scale_mat(0.011)\n        # self.notebook.add_and_init_field(avango.gua.SFMatrix4(), \"HomeMatrix\", self.notebook.Transform.value)\n        # PARENT_NODE.Children.value.append(self.notebook)\n        \n\n        # tablelamp\n        # self.tablelamp = _loader.create_geometry_from_file(\"tablelamp\", \"/opt/3d_models/Jacobs_Models/tablelamp/tablelamp.obj\", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.LOAD_MATERIALS | avango.gua.LoaderFlags.MAKE_PICKABLE)\n        # self.tablelamp.Transform.value = avango.gua.make_trans_mat(-0.08, 0.215, -0.0) * \\\n        #     avango.gua.make_rot_mat(90.0,-1,0,0) * \\\n        #     avango.gua.make_rot_mat(135.0,0,0,-1) * \\\n        #     avango.gua.make_scale_mat(0.00022)\n        # self.tablelamp.add_and_init_field(avango.gua.SFMatrix4(), \"HomeMatrix\", self.tablelamp.Transform.value)\n        # PARENT_NODE.Children.value.append(self.tablelamp)\n                                     \n\n\n        # telephone\n        # self.telephone = _loader.create_geometry_from_file(\"telephone\", \"/opt/3d_models/Jacobs_Models/telephone/telephone.obj\", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.LOAD_MATERIALS | avango.gua.LoaderFlags.MAKE_PICKABLE)\n        # self.telephone.Transform.value = avango.gua.make_trans_mat(-0.05, 0.065, -0.03) * \\\n        #     avango.gua.make_rot_mat(90.0,-1,0,0) * \\\n        #     avango.gua.make_rot_mat(65.0,0,0,-1) * \\\n        #     avango.gua.make_scale_mat(0.000012)\n        # self.telephone.add_and_init_field(avango.gua.SFMatrix4(), \"HomeMatrix\", self.telephone.Transform.value)\n        # PARENT_NODE.Children.value.append(self.telephone)\n        \n   \n        # penholder\n        # self.penholder = _loader.create_geometry_from_file(\"penholder\", \"/opt/3d_models/Jacobs_Models/penholder/penholder.obj\", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.LOAD_MATERIALS | avango.gua.LoaderFlags.MAKE_PICKABLE)\n        # self.penholder.Transform.value = avango.gua.make_trans_mat(-0.08, 0.2, -0.13) * \\\n        #     avango.gua.make_rot_mat(90.0,-1,0,0) * \\\n        #     avango.gua.make_scale_mat(0.0002)\n        # self.penholder.add_and_init_field(avango.gua.SFMatrix4(), \"HomeMatrix\", self.penholder.Transform.value)\n        # PARENT_NODE.Children.value.append(self.penholder)\n        \n\n        # calculator\n        # self.calculator = _loader.create_geometry_from_file(\"calculator\", \"/opt/3d_models/Jacobs_Models/calculator/calculator.obj\", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.LOAD_MATERIALS | avango.gua.LoaderFlags.MAKE_PICKABLE)\n        # self.calculator.Transform.value = avango.gua.make_trans_mat(-0.16, 0.055, 0.03) * \\\n        #     avango.gua.make_rot_mat(90.0,-1,0,0) * \\\n        #     avango.gua.make_rot_mat(13.0,0,0,1) * \\\n        #     avango.gua.make_scale_mat(0.01)\n        # self.calculator.add_and_init_field(avango.gua.SFMatrix4(), \"HomeMatrix\", self.calculator.Transform.value)\n        # PARENT_NODE.Children.value.append(self.calculator)\n\n\n    ### functions ###\n    def reset(self):\n        print(\"reset\")\n        for _node in self.PARENT_NODE.Children.value:\n            if _node.has_field(\"HomeMatrix\") == True:\n                _node.Transform.value = _node.HomeMatrix.value\n                \n",
+			"file": "mini-project/lib/Scene.py",
+			"file_size": 9109,
+			"file_write_time": 131395924411372587,
+			"settings":
+			{
+				"buffer_size": 9157,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -586,28 +611,31 @@
 	"expanded_folders":
 	[
 		"/home/liju1602/github/avango_assignments",
-		"/home/liju1602/github/avango_assignments/final_project",
 		"/home/liju1602/github/avango_assignments/mini-project",
+		"/home/liju1602/github/avango_assignments/mini-project/leap",
 		"/home/liju1602/github/avango_assignments/mini-project/lib"
 	],
 	"file_history":
 	[
-		"/home/liju1602/github/avango_assignments/mini-project/lib/GuaVE.py",
+		"/home/liju1602/github/avango_assignments/08_navigation/lib/Navigation.py",
+		"/home/liju1602/github/avango_assignments/08_navigation/lib/Device.py",
 		"/home/liju1602/github/avango_assignments/mini-project/lib/Navigation.py",
+		"/home/liju1602/github/avango_assignments/mini-project/main.py",
+		"/home/liju1602/github/avango_assignments/mini-project/lib/MultiUserViewingSetup.py",
+		"/home/liju1602/github/avango_assignments/mini-project/lib/ViewingSetup.py",
+		"/home/liju1602/github/avango_assignments/final_project/tabletop multitouch resources.txt",
+		"/home/liju1602/github/avango_assignments/final_project/tabletop start todo.txt",
+		"/home/liju1602/github/avango_assignments/mini-project/lib/GuaVE.py",
 		"/home/liju1602/github/avango_assignments/mini-project/lib/Manipulation.py",
 		"/home/liju1602/github/avango_assignments/06_immersive_3D/main.py",
-		"/home/liju1602/github/avango_assignments/final_project/tabletop start todo.txt",
 		"/home/liju1602/github/avango_assignments/05_transfer_functions/daemon.py",
 		"/home/liju1602/github/avango_assignments/04_dragging/daemon.py",
-		"/home/liju1602/github/avango_assignments/final_project/tabletop multitouch resources.txt",
-		"/home/liju1602/github/avango_assignments/08_navigation/lib/Navigation.py",
 		"/home/liju1602/github/avango_assignments/mini-project/start.sh",
 		"/home/liju1602/github/avango_assignments/00_tutorial/start.sh",
 		"/home/liju1602/github/avango_assignments/final_project/main.py",
 		"/home/liju1602/github/avango_assignments/mini-project/lib/Scene.py",
 		"/home/liju1602/github/avango_assignments/final_project/links.txt",
 		"/home/liju1602/github/avango_assignments/08_navigation/lib/SimpleViewingSetup.py~",
-		"/home/liju1602/github/avango_assignments/mini-project/lib/ViewingSetup.py",
 		"/home/liju1602/github/avango_assignments/08_navigation/main.py",
 		"/home/liju1602/github/avango_assignments/08_navigation/lib/ViewingSetup.py",
 		"/home/liju1602/github/avango_assignments/final_project/LeapSDK/python3.5_project/Sample.py",
@@ -716,10 +744,7 @@
 		"/home/liju1602/.config/sublime-text-3/Packages/User/Default (Linux).sublime-keymap",
 		"/home/liju1602/my_avango/01_hierarchical_structuring/lib/SolarSystem.py",
 		"/home/liju1602/my_avango/01_hierarchical_structuring/main.py",
-		"/home/liju1602/my_avango/01_hierarchical_structuring/lib/SimpleViewingSetup.py",
-		"/home/liju1602/my_avango/01_hierarchical_structuring/lib/Device.py",
-		"/home/liju1602/my_avango/01_hierarchical_structuring/lib/Navigation.py",
-		"/opt/avango/master/examples/simple_example/main.py"
+		"/home/liju1602/my_avango/01_hierarchical_structuring/lib/SimpleViewingSetup.py"
 	],
 	"find":
 	{
@@ -741,6 +766,9 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"mf_dof",
+			"sf_button",
+			"vec3",
 			"STEREO_MODE",
 			"stereo",
 			"SCREEN_MATRIX",
@@ -846,7 +874,7 @@
 	"groups":
 	[
 		{
-			"selected": 3,
+			"selected": 6,
 			"sheets":
 			[
 				{
@@ -881,94 +909,34 @@
 				},
 				{
 					"buffer": 1,
-					"file": "mini-project/main.py",
+					"file": "mini-project/start.sh",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 6367,
+						"buffer_size": 753,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4499,
-								4499
+								310,
+								310
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Python/Python.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
+							"syntax": "Packages/ShellScript/Shell-Unix-Generic.sublime-syntax"
 						},
 						"translation.x": 0.0,
-						"translation.y": 509.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
 					"buffer": 2,
-					"file": "final_project/tabletop multitouch resources.txt",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2455,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								93,
-								93
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Text/Plain text.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "final_project/tabletop start todo.txt",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 605,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								436,
-								436
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Text/Plain text.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
 					"file": "mini-project/daemon.py",
 					"semi_transient": false,
 					"settings":
@@ -980,8 +948,69 @@
 						"selection":
 						[
 							[
-								321,
-								321
+								2282,
+								2282
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 255.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "mini-project/lib/LeapSensor.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8460,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2036,
+								2036
+							]
+						],
+						"settings":
+						{
+							"auto_name": "",
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 551.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "mini-project/main.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4794,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								163,
+								163
 							]
 						],
 						"settings":
@@ -994,75 +1023,74 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "mini-project/leap/Sample.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6721,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								6495,
+								6495
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 110.0,
+						"zoom_level": 1.0
+					},
 					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "mini-project/lib/Scene.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 9157,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4107,
+								4113
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 969.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
 					"type": "text"
 				}
 			]
 		},
 		{
-			"selected": 0,
 			"sheets":
 			[
-				{
-					"buffer": 5,
-					"file": "mini-project/lib/MultiUserViewingSetup.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 11752,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								6959,
-								6959
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 1929.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"file": "mini-project/lib/ViewingSetup.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 7457,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				}
 			]
 		}
 	],
@@ -1094,7 +1122,7 @@
 		"cols":
 		[
 			0.0,
-			0.426010129119,
+			0.8060676359,
 			1.0
 		],
 		"rows":
@@ -1166,7 +1194,7 @@
 		],
 		"width": 0.0
 	},
-	"selected_group": 1,
+	"selected_group": 0,
 	"settings":
 	{
 	},
@@ -1174,7 +1202,7 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 314.0,
+	"side_bar_width": 284.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

@@ -11,6 +11,8 @@ from lib.LeapSensor import LeapSensor
 
 class SceneScript(avango.script.Script):
 
+    Physics = avango.gua.SFPhysics()
+
     ## input fields
     sf_reset_button = avango.SFBool()
 
@@ -81,86 +83,58 @@ class Scene:
         self.base_node.Transform.value = avango.gua.make_trans_mat(-2.1, 0.96, 0.705) * avango.gua.make_rot_mat(90.0, 0, 1, 0) * avango.gua.make_rot_mat(90.0, -1, 0, 0)
         PARENT_NODE.Children.value.append(self.base_node)
 
+        # self.cube_node_static = avango.gua.nodes.TransformNode(Name="cube_node_static")
+        # self.cube_node_static.Transform.value = avango.gua.make_trans_mat(0.0, 0.0, 0.0) * avango.gua.make_scale_mat(0.05,0.05,0.05)
+        # self.cube_static = _loader.create_geometry_from_file("cube", "data/objects/cube.obj", avango.gua.LoaderFlags.DEFAULTS)
+        # self.cube.Material.value.set_uniform("Color", avango.gua.Vec4(1.0, 0.0, 0.0, 1.0))
+        # self.cube_node_static.Children.value.append(self.cube_static)
+        # self.base_node.Children.value.append(self.cube_node_static)
+
+        floor = self.create_floor(_loader)
+        self.base_node.Children.value.append(floor)
+        physics = avango.gua.nodes.Physics()
+        physics.add_rigid_body(floor)
+
         self.cube_node = avango.gua.nodes.TransformNode(Name="cube_node")
-        self.cube_node.Transform.value = avango.gua.make_trans_mat(0.0, 0.0, 0.0) * avango.gua.make_scale_mat(0.05,0.05,0.05)
+        self.cube_node.Transform.value = avango.gua.make_trans_mat(0.0, 0.0, 1.0) * avango.gua.make_scale_mat(0.05,0.05,0.05)
         self.cube = _loader.create_geometry_from_file("cube", "data/objects/cube.obj", avango.gua.LoaderFlags.DEFAULTS)
         self.cube.Material.value.set_uniform("Color", avango.gua.Vec4(1.0, 0.0, 0.0, 1.0))
         self.cube_node.Children.value.append(self.cube)
         self.base_node.Children.value.append(self.cube_node)
 
+        body = avango.gua.nodes.RigidBodyNode(
+            Name="body",
+            Mass=2.0,
+            Friction=0.6,
+            RollingFriction=0.03,
+            Restitution=0.3,
+            # Transform=avango.gua.make_trans_mat(math.sin(3 * current_time), 7.0, math.cos(3 * current_time))
+            )
+
+        collision_shape_node = avango.gua.nodes.CollisionShapeNode(
+            Name="collision_shape_node",
+            ShapeName="cube")
+
+        collision_shape_node.Children.value.append(self.cube)
+        body.Children.value.append(collision_shape_node)
+        PARENT_NODE.Children.value.append(body)
+        physics.add_rigid_body(body)
+
+
         leap = LeapSensor()
-        leap.my_constructor()
-        self.cube_node.Transform.connect_from(leap.sf_mat)
-
-        # ground
-        # self.ground = _loader.create_geometry_from_file("ground", "data/objects/cube.obj", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.LOAD_MATERIALS)
-        # self.ground.Transform.value = avango.gua.make_trans_mat(0.0,-0.17,0.0) * \
-        #     avango.gua.make_scale_mat(1.0,0.005,1.0)
-        # self.ground.Material.value.set_uniform("Color", avango.gua.Vec4(0.7,0.7,1.0,1.0))
-        # self.ground.Material.value.set_uniform("Emissivity", 0.5)
-        # self.ground.Material.value.set_uniform("Metalness", 0.1)
-        # self.ground.add_and_init_field(avango.gua.SFMatrix4(), "HomeMatrix", self.ground.Transform.value)
-        # PARENT_NODE.Children.value.append(self.ground)
+        leap.my_constructor(SCENEGRAPH = PARENT_NODE)
+        # self.cube_node.Transform.connect_from(leap.sf_mat)
 
 
-        # table
-        # self.table = _loader.create_geometry_from_file("table", "/opt/3d_models/Jacobs_Models/table_ikea/table_ikea.obj", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.LOAD_MATERIALS | avango.gua.LoaderFlags.MAKE_PICKABLE)
-        # self.table.Transform.value = avango.gua.make_trans_mat(0.0, -0.17, 0.0) * \
-        #     avango.gua.make_rot_mat(90.0,-1,0,0) * \
-        #     avango.gua.make_scale_mat(0.0003)
-        # self.table.add_and_init_field(avango.gua.SFMatrix4(), "HomeMatrix", self.table.Transform.value)
-        # PARENT_NODE.Children.value.append(self.table)
-        
-
-        # notebook
-        # self.notebook = _loader.create_geometry_from_file("notebook", "/opt/3d_models/Jacobs_Models/notebook/notebook.obj", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.LOAD_MATERIALS | avango.gua.LoaderFlags.MAKE_PICKABLE)
-        # self.notebook.Transform.value = avango.gua.make_trans_mat(-2.1, 0.96, 0.705) * \
-        #     avango.gua.make_rot_mat(90.0,-1,0,0) * \
-        #     avango.gua.make_rot_mat(10.0,0,0,-1) * \
-        #     avango.gua.make_scale_mat(0.011)
-        # self.notebook.add_and_init_field(avango.gua.SFMatrix4(), "HomeMatrix", self.notebook.Transform.value)
-        # PARENT_NODE.Children.value.append(self.notebook)
-        
-
-        # tablelamp
-        # self.tablelamp = _loader.create_geometry_from_file("tablelamp", "/opt/3d_models/Jacobs_Models/tablelamp/tablelamp.obj", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.LOAD_MATERIALS | avango.gua.LoaderFlags.MAKE_PICKABLE)
-        # self.tablelamp.Transform.value = avango.gua.make_trans_mat(-0.08, 0.215, -0.0) * \
-        #     avango.gua.make_rot_mat(90.0,-1,0,0) * \
-        #     avango.gua.make_rot_mat(135.0,0,0,-1) * \
-        #     avango.gua.make_scale_mat(0.00022)
-        # self.tablelamp.add_and_init_field(avango.gua.SFMatrix4(), "HomeMatrix", self.tablelamp.Transform.value)
-        # PARENT_NODE.Children.value.append(self.tablelamp)
-                                     
-
-
-        # telephone
-        # self.telephone = _loader.create_geometry_from_file("telephone", "/opt/3d_models/Jacobs_Models/telephone/telephone.obj", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.LOAD_MATERIALS | avango.gua.LoaderFlags.MAKE_PICKABLE)
-        # self.telephone.Transform.value = avango.gua.make_trans_mat(-0.05, 0.065, -0.03) * \
-        #     avango.gua.make_rot_mat(90.0,-1,0,0) * \
-        #     avango.gua.make_rot_mat(65.0,0,0,-1) * \
-        #     avango.gua.make_scale_mat(0.000012)
-        # self.telephone.add_and_init_field(avango.gua.SFMatrix4(), "HomeMatrix", self.telephone.Transform.value)
-        # PARENT_NODE.Children.value.append(self.telephone)
-        
-   
-        # penholder
-        # self.penholder = _loader.create_geometry_from_file("penholder", "/opt/3d_models/Jacobs_Models/penholder/penholder.obj", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.LOAD_MATERIALS | avango.gua.LoaderFlags.MAKE_PICKABLE)
-        # self.penholder.Transform.value = avango.gua.make_trans_mat(-0.08, 0.2, -0.13) * \
-        #     avango.gua.make_rot_mat(90.0,-1,0,0) * \
-        #     avango.gua.make_scale_mat(0.0002)
-        # self.penholder.add_and_init_field(avango.gua.SFMatrix4(), "HomeMatrix", self.penholder.Transform.value)
-        # PARENT_NODE.Children.value.append(self.penholder)
-        
-
-        # calculator
-        # self.calculator = _loader.create_geometry_from_file("calculator", "/opt/3d_models/Jacobs_Models/calculator/calculator.obj", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.LOAD_MATERIALS | avango.gua.LoaderFlags.MAKE_PICKABLE)
-        # self.calculator.Transform.value = avango.gua.make_trans_mat(-0.16, 0.055, 0.03) * \
-        #     avango.gua.make_rot_mat(90.0,-1,0,0) * \
-        #     avango.gua.make_rot_mat(13.0,0,0,1) * \
-        #     avango.gua.make_scale_mat(0.01)
-        # self.calculator.add_and_init_field(avango.gua.SFMatrix4(), "HomeMatrix", self.calculator.Transform.value)
-        # PARENT_NODE.Children.value.append(self.calculator)
-
+        # # ground_table table
+        # self.ground_table = _loader.create_geometry_from_file("ground_table", "data/objects/cube.obj", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.LOAD_MATERIALS)
+        # self.ground_table.Transform.value = avango.gua.make_trans_mat(0.0,0.1,0.0) * \
+        #     avango.gua.make_scale_mat(1.0, 0.05, 0.7)
+        # self.ground_table.Material.value.set_uniform("Color", avango.gua.Vec4(211,211,211,1.0))
+        # # self.ground_table.Material.value.set_uniform("Emissivity", 0.5)
+        # # self.ground_table.Material.value.set_uniform("Metalness", 0.1)
+        # # self.ground_table.add_and_init_field(avango.gua.SFMatrix4(), "HomeMatrix", self.ground_table.Transform.value)
+        # self.base_node.Children.value.append(self.ground_table)
 
     ### functions ###
     def reset(self):
@@ -169,3 +143,29 @@ class Scene:
             if _node.has_field("HomeMatrix") == True:
                 _node.Transform.value = _node.HomeMatrix.value
                 
+
+    def create_floor(self, loader):
+        floor_geometry = loader.create_geometry_from_file(
+            "floor_geometry", "data/objects/plane.obj",
+            avango.gua.LoaderFlags.NORMALIZE_SCALE | avango.gua.LoaderFlags.NORMALIZE_POSITION)
+
+        floor_geometry.Transform.value = avango.gua.make_trans_mat(0, 0, 0.1) * avango.gua.make_scale_mat(10, 10.0, 10)
+        floor_geometry.Material.value.set_uniform("Metalness", 0.0)
+        floor_geometry.Material.value.set_uniform(
+            "RoughnessMap", "data/textures/oakfloor2_roughness.png")
+        floor_geometry.Material.value.set_uniform(
+            "ColorMap", "data/textures/oakfloor2_basecolor.png")
+        floor_geometry.Material.value.set_uniform(
+            "NormalMap", "data/textures/oakfloor2_normal.png")
+
+        avango.gua.create_box_shape("box", avango.gua.Vec3(10, 1, 10))
+        floor_collision_shape = avango.gua.nodes.CollisionShapeNode(
+            Name="floor_shape",
+            ShapeName="box",
+            Children=[floor_geometry])
+        floor_body = avango.gua.nodes.RigidBodyNode(Name="floor_body",
+                                            Mass=0,
+                                            Friction=0.5,
+                                            Restitution=0.7,
+                                            Children=[floor_collision_shape])
+        return floor_body
