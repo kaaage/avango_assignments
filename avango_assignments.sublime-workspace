@@ -542,7 +542,7 @@
 			"file": "mini-project/lib/LeapSensor.py",
 			"settings":
 			{
-				"buffer_size": 8460,
+				"buffer_size": 11097,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -566,13 +566,10 @@
 			}
 		},
 		{
-			"contents": "#!/usr/bin/python\n\n### import guacamole libraries\nimport avango\nimport avango.gua\nimport avango.script\nfrom avango.script import field_has_changed\n\n### import application libraries\nfrom lib.LeapSensor import LeapSensor\n\nclass SceneScript(avango.script.Script):\n\n    ## input fields\n    sf_reset_button = avango.SFBool()\n\n    ## Default constructor.\n    def __init__(self):\n        self.super(SceneScript).__init__()\n\n        ### external references ###\n        self.CLASS = None # is set later\n        \n\n        ### resources ###\n        self.keyboard_device_sensor = avango.daemon.nodes.DeviceSensor(DeviceService = avango.daemon.DeviceService())\n        self.keyboard_device_sensor.Station.value = \"gua-device-keyboard0\"\n\n        self.sf_reset_button.connect_from(self.keyboard_device_sensor.Button14) # spacebar key\n\n\n    def my_constructor(self, CLASS):\n        self.CLASS = CLASS\n\n\n    ### callbacks ###  \n    @field_has_changed(sf_reset_button)\n    def sf_reset_button_changed(self):\n        if self.sf_reset_button.value == True and self.CLASS is not None: # button pressed\n            self.CLASS.reset()\n            \n\n\nclass Scene:\n\n    ## constructor\n    def __init__(self,\n        PARENT_NODE = None,\n        ):\n\n\n        ### external reference ###\n        self.PARENT_NODE = PARENT_NODE\n\n        ### resources ###                \n        self.script = SceneScript()\n        self.script.my_constructor(self)\n\n\n        ## init scene light\n        self.scene_light = avango.gua.nodes.LightNode(Name = \"scene_light\")\n        self.scene_light.Type.value = avango.gua.LightType.SPOT\n        self.scene_light.Color.value = avango.gua.Color(1.0,1.0,0.8)\n        self.scene_light.Brightness.value = 20.0\n        self.scene_light.Falloff.value = 0.1 # exponent\n        self.scene_light.EnableShadows.value = True\n        self.scene_light.ShadowMapSize.value = 2048\n        self.scene_light.ShadowOffset.value = 0.001\n        self.scene_light.ShadowNearClippingInSunDirection.value = 0.1 * (1.0/4.0)\n        self.scene_light.ShadowMaxDistance.value = 10.0 # maximal distance, the shadow is visible\n        self.scene_light.ShadowNearClippingInSunDirection.value = 0.05\n        self.scene_light.Transform.value = avango.gua.make_trans_mat(0.0,1.2,0.5) * \\\n            avango.gua.make_rot_mat(80.0,-1,0,0) * \\\n            avango.gua.make_scale_mat(3.0)\n        PARENT_NODE.Children.value.append(self.scene_light)\n\n        ## init scene geometries\n        _loader = avango.gua.nodes.TriMeshLoader() # get trimesh loader to load external meshes\n\n        self.base_node = avango.gua.nodes.TransformNode(Name=\"base_node\")\n        self.base_node.Transform.value = avango.gua.make_trans_mat(-2.1, 0.96, 0.705) * avango.gua.make_rot_mat(90.0, 0, 1, 0) * avango.gua.make_rot_mat(90.0, -1, 0, 0)\n        PARENT_NODE.Children.value.append(self.base_node)\n\n        self.cube_node = avango.gua.nodes.TransformNode(Name=\"cube_node\")\n        self.cube_node.Transform.value = avango.gua.make_trans_mat(0.0, 0.0, 0.0) * avango.gua.make_scale_mat(0.05,0.05,0.05)\n        self.cube = _loader.create_geometry_from_file(\"cube\", \"data/objects/cube.obj\", avango.gua.LoaderFlags.DEFAULTS)\n        self.cube.Material.value.set_uniform(\"Color\", avango.gua.Vec4(1.0, 0.0, 0.0, 1.0))\n        self.cube_node.Children.value.append(self.cube)\n        self.base_node.Children.value.append(self.cube_node)\n\n\n        self.cube_node_static = avango.gua.nodes.TransformNode(Name=\"cube_node_static\")\n        self.cube_node_static.Transform.value = avango.gua.make_trans_mat(0.0, 0.0, 0.0) * avango.gua.make_scale_mat(0.05,0.05,0.05)\n        self.cube_static = _loader.create_geometry_from_file(\"cube\", \"data/objects/cube.obj\", avango.gua.LoaderFlags.DEFAULTS)\n        self.cube.Material.value.set_uniform(\"Color\", avango.gua.Vec4(1.0, 0.0, 0.0, 1.0))\n        self.cube_node_static.Children.value.append(self.cube_static)\n        self.base_node.Children.value.append(self.cube_node_static)\n\n\n        leap = LeapSensor()\n        leap.my_constructor()\n        self.cube_node.Transform.connect_from(leap.sf_mat)\n\n        # ground table\n        self.ground = _loader.create_geometry_from_file(\"ground\", \"data/objects/cube.obj\", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.LOAD_MATERIALS)\n        self.ground.Transform.value = avango.gua.make_trans_mat(0.0,-0.17,0.0) * \\\n            avango.gua.make_scale_mat(1.0,0.005,1.0)\n        self.ground.Material.value.set_uniform(\"Color\", avango.gua.Vec4(0.7,0.7,1.0,1.0))\n        self.ground.Material.value.set_uniform(\"Emissivity\", 0.5)\n        self.ground.Material.value.set_uniform(\"Metalness\", 0.1)\n        self.ground.add_and_init_field(avango.gua.SFMatrix4(), \"HomeMatrix\", self.ground.Transform.value)\n        self.base_node.Children.value.append(self.ground)\n        PARENT_NODE.Children.value.append(self.ground)\n\n\n        # table\n        # self.table = _loader.create_geometry_from_file(\"table\", \"/opt/3d_models/Jacobs_Models/table_ikea/table_ikea.obj\", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.LOAD_MATERIALS | avango.gua.LoaderFlags.MAKE_PICKABLE)\n        # self.table.Transform.value = avango.gua.make_trans_mat(0.0, -0.17, 0.0) * \\\n        #     avango.gua.make_rot_mat(90.0,-1,0,0) * \\\n        #     avango.gua.make_scale_mat(0.0003)\n        # self.table.add_and_init_field(avango.gua.SFMatrix4(), \"HomeMatrix\", self.table.Transform.value)\n        # PARENT_NODE.Children.value.append(self.table)\n        \n\n        # notebook\n        # self.notebook = _loader.create_geometry_from_file(\"notebook\", \"/opt/3d_models/Jacobs_Models/notebook/notebook.obj\", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.LOAD_MATERIALS | avango.gua.LoaderFlags.MAKE_PICKABLE)\n        # self.notebook.Transform.value = avango.gua.make_trans_mat(-2.1, 0.96, 0.705) * \\\n        #     avango.gua.make_rot_mat(90.0,-1,0,0) * \\\n        #     avango.gua.make_rot_mat(10.0,0,0,-1) * \\\n        #     avango.gua.make_scale_mat(0.011)\n        # self.notebook.add_and_init_field(avango.gua.SFMatrix4(), \"HomeMatrix\", self.notebook.Transform.value)\n        # PARENT_NODE.Children.value.append(self.notebook)\n        \n\n        # tablelamp\n        # self.tablelamp = _loader.create_geometry_from_file(\"tablelamp\", \"/opt/3d_models/Jacobs_Models/tablelamp/tablelamp.obj\", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.LOAD_MATERIALS | avango.gua.LoaderFlags.MAKE_PICKABLE)\n        # self.tablelamp.Transform.value = avango.gua.make_trans_mat(-0.08, 0.215, -0.0) * \\\n        #     avango.gua.make_rot_mat(90.0,-1,0,0) * \\\n        #     avango.gua.make_rot_mat(135.0,0,0,-1) * \\\n        #     avango.gua.make_scale_mat(0.00022)\n        # self.tablelamp.add_and_init_field(avango.gua.SFMatrix4(), \"HomeMatrix\", self.tablelamp.Transform.value)\n        # PARENT_NODE.Children.value.append(self.tablelamp)\n                                     \n\n\n        # telephone\n        # self.telephone = _loader.create_geometry_from_file(\"telephone\", \"/opt/3d_models/Jacobs_Models/telephone/telephone.obj\", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.LOAD_MATERIALS | avango.gua.LoaderFlags.MAKE_PICKABLE)\n        # self.telephone.Transform.value = avango.gua.make_trans_mat(-0.05, 0.065, -0.03) * \\\n        #     avango.gua.make_rot_mat(90.0,-1,0,0) * \\\n        #     avango.gua.make_rot_mat(65.0,0,0,-1) * \\\n        #     avango.gua.make_scale_mat(0.000012)\n        # self.telephone.add_and_init_field(avango.gua.SFMatrix4(), \"HomeMatrix\", self.telephone.Transform.value)\n        # PARENT_NODE.Children.value.append(self.telephone)\n        \n   \n        # penholder\n        # self.penholder = _loader.create_geometry_from_file(\"penholder\", \"/opt/3d_models/Jacobs_Models/penholder/penholder.obj\", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.LOAD_MATERIALS | avango.gua.LoaderFlags.MAKE_PICKABLE)\n        # self.penholder.Transform.value = avango.gua.make_trans_mat(-0.08, 0.2, -0.13) * \\\n        #     avango.gua.make_rot_mat(90.0,-1,0,0) * \\\n        #     avango.gua.make_scale_mat(0.0002)\n        # self.penholder.add_and_init_field(avango.gua.SFMatrix4(), \"HomeMatrix\", self.penholder.Transform.value)\n        # PARENT_NODE.Children.value.append(self.penholder)\n        \n\n        # calculator\n        # self.calculator = _loader.create_geometry_from_file(\"calculator\", \"/opt/3d_models/Jacobs_Models/calculator/calculator.obj\", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.LOAD_MATERIALS | avango.gua.LoaderFlags.MAKE_PICKABLE)\n        # self.calculator.Transform.value = avango.gua.make_trans_mat(-0.16, 0.055, 0.03) * \\\n        #     avango.gua.make_rot_mat(90.0,-1,0,0) * \\\n        #     avango.gua.make_rot_mat(13.0,0,0,1) * \\\n        #     avango.gua.make_scale_mat(0.01)\n        # self.calculator.add_and_init_field(avango.gua.SFMatrix4(), \"HomeMatrix\", self.calculator.Transform.value)\n        # PARENT_NODE.Children.value.append(self.calculator)\n\n\n    ### functions ###\n    def reset(self):\n        print(\"reset\")\n        for _node in self.PARENT_NODE.Children.value:\n            if _node.has_field(\"HomeMatrix\") == True:\n                _node.Transform.value = _node.HomeMatrix.value\n                \n",
 			"file": "mini-project/lib/Scene.py",
-			"file_size": 9109,
-			"file_write_time": 131395924411372587,
 			"settings":
 			{
-				"buffer_size": 9157,
+				"buffer_size": 7399,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -610,10 +607,7 @@
 	},
 	"expanded_folders":
 	[
-		"/home/liju1602/github/avango_assignments",
-		"/home/liju1602/github/avango_assignments/mini-project",
-		"/home/liju1602/github/avango_assignments/mini-project/leap",
-		"/home/liju1602/github/avango_assignments/mini-project/lib"
+		"/home/royo0628/Desktop/avango_assignments"
 	],
 	"file_history":
 	[
@@ -971,15 +965,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 8460,
+						"buffer_size": 11097,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2036,
-								2036
+								0,
+								0
 							]
 						],
 						"settings":
@@ -1062,7 +1056,7 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 9157,
+						"buffer_size": 7399,
 						"regions":
 						{
 						},

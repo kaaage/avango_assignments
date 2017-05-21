@@ -57,6 +57,8 @@ class StereoViewingSetup:
         self.viewer.Windows.value = [self.window]
         self.viewer.DesiredFPS.value = 60.0 # in Hz
 
+        #init physics
+        self.viewer.Physics.value = avango.gua.nodes.Physics()
 
         ## init passes & render pipeline description
         self.resolve_pass = avango.gua.nodes.ResolvePassDescription()

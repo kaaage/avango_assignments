@@ -18,9 +18,11 @@ def start():
 
     ## create scenegraph
     scenegraph = avango.gua.nodes.SceneGraph(Name = "scenegraph")
+    #physics = avango.gua.nodes.Physics()
 
     ## init scene
     scene = Scene(PARENT_NODE = scenegraph.Root.value)
+    #scene.Physics.value = physics
 
 
     ## init navigation technique

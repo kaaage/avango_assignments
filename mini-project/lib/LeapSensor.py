@@ -38,16 +38,20 @@ class LeapSensor(avango.script.Script):
 
     cube_picked = None
 
+
     def __init__(self):
         self.super(LeapSensor).__init__()
 
     def my_constructor(self,
         # SCENE = None,
         SCENEGRAPH = None,
+        BASENODE = None,
+
         # NAVIGATION_NODE = None,
         TRACKING_TRANSMITTER_OFFSET = avango.gua.make_identity_mat(),
         ):
         self.SCENEGRAPH = SCENEGRAPH
+        self.BASENODE = BASENODE
         # self.SCENE = SCENE
 
         ### Picking ###
@@ -84,6 +88,22 @@ class LeapSensor(avango.script.Script):
         #     # Remove the sample listener when done
         #     controller.remove_listener(listener)
 
+        #tip visualization
+        _loader = avango.gua.nodes.TriMeshLoader() # get trimesh loader to load external meshes
+        self.thumb_sphere = avango.gua.nodes.TransformNode(Name="thumb_sphere")
+        self.thumb_sphere.Transform.value = self.handright_thumb_pos.value * avango.gua.make_scale_mat(0.03,0.03,0.03)
+        self.thumb_sphere_geometry = _loader.create_geometry_from_file("thumb_sphere", "data/objects/sphere.obj", avango.gua.LoaderFlags.DEFAULTS)
+        self.thumb_sphere_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(1.0, 0.0, 0.0, 1.0))
+        self.thumb_sphere.Children.value.append(self.thumb_sphere_geometry)
+        self.BASENODE.Children.value.append(self.thumb_sphere)
+
+        self.index_sphere = avango.gua.nodes.TransformNode(Name="index_sphere")
+        self.index_sphere.Transform.value = self.handright_index_pos.value * avango.gua.make_scale_mat(0.03,0.03,0.03)
+        self.index_sphere_geometry = _loader.create_geometry_from_file("index_sphere", "data/objects/sphere.obj", avango.gua.LoaderFlags.DEFAULTS)
+        self.index_sphere_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(1.0, 0.0, 0.0, 1.0))
+        self.index_sphere.Children.value.append(self.index_sphere_geometry)
+        self.BASENODE.Children.value.append(self.index_sphere)
+
         self.always_evaluate(True) # change global evaluation policy
 
     def evaluate(self):
@@ -106,11 +126,22 @@ class LeapSensor(avango.script.Script):
         self.handleft_pinch_strength = frame.hands.leftmost.pinch_strength
 
         ## calc intersections - picked cubes
-        _mf_handright_pick_result = self.calc_pick_result(PICK_MAT = self.handright_thumb_pos.value, PICK_LENGTH = 0.05)
-        _mf_handleft_pick_result = self.calc_pick_result(PICK_MAT = self.handleft_thumb_pos.value, PICK_LENGTH = 0.05)
+        if (self.handright_pinch_strength > 0.8):
+            _mf_handright_pick_result = self.calc_pick_result(PICK_MAT = self.handright_thumb_pos.value, PICK_LENGTH = 0.05)
+            if _mf_handright_pick_result != None:
+                _mf_handright_pick_result.Transform.value = self.handright_index_pos.value
+
+        
+        if (self.handleft_pinch_strength > 0.8):
+            _mf_handleft_pick_result = self.calc_pick_result(PICK_MAT = self.handleft_thumb_pos.value, PICK_LENGTH = 0.05)
+            if _mf_handleft_pick_result != None:
+                _mf_handleft_pick_result.Transform.value = self.handleft_index_pos.value
 
         ### todo: calculate cube position offset
         offset_mat = avango.gua.make_trans_mat(0.0,0.0,0.425)
+
+        self.thumb_sphere.Transform.value = self.handright_thumb_pos.value * avango.gua.make_scale_mat(0.3,0.3,0.3)
+        self.index_sphere.Transform.value = self.handright_index_pos.value * avango.gua.make_scale_mat(0.3,0.3,0.3)
 
         # rot = index_finger.direction
         # This should be the quaternion rotation of -45 euler around x ( avango.gua.make_rot_mat( 0.92388,-0.38268,0,0) )
@@ -128,8 +159,8 @@ class LeapSensor(avango.script.Script):
         self.ray.Direction.value = _vec * PICK_LENGTH
 
         # intersect
-        # _mf_pick_result = self.SCENEGRAPH.ray_test(self.ray, self.pick_options, self.white_list, self.black_list)
-        _mf_pick_result = None
+        _mf_pick_result = self.SCENEGRAPH.ray_test(self.ray, self.pick_options, self.white_list, self.black_list)
+        #_mf_pick_result = None
 
         return _mf_pick_result
 

@@ -53,6 +53,7 @@ class Scene:
         PARENT_NODE = None,
         ):
 
+        Physics = avango.gua.SFPhysics()
         physics = avango.gua.nodes.Physics()
 
         ### external reference ###
@@ -91,6 +92,8 @@ class Scene:
         self.base_node.Children.value.append(floor)
         physics.add_rigid_body(floor)
 
+        Physics.value = physics
+
         body = avango.gua.nodes.RigidBodyNode(
             Name="body",
             Mass=2.0,
@@ -119,10 +122,16 @@ class Scene:
         collision_shape_node.Children.value.append(cube_geometry)
         body.Children.value.append(collision_shape_node)
         self.base_node.Children.value.append(body)
-        physics.add_rigid_body(body)
+        Physics.value.add_rigid_body(body)
 
         leap = LeapSensor()
-        leap.my_constructor(SCENEGRAPH = PARENT_NODE)
+        leap.my_constructor(SCENEGRAPH = PARENT_NODE, BASENODE = self.base_node)
+
+        # viewer = avango.gua.nodes.Viewer()
+        # viewer.Physics.value = physics
+        # viewer.SceneGraphs.value = [graph]
+        # viewer.Windows.value = [window]    
+
         # self.cube_node.Transform.connect_from(leap.sf_mat)
 
 
