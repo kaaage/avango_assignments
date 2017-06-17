@@ -106,11 +106,14 @@ class LeapSensor(avango.script.Script):
         self.handleft_pinch_strength = frame.hands.leftmost.pinch_strength
 
         ## calc intersections - picked cubes
-        _mf_handright_pick_result = self.calc_pick_result(PICK_MAT = self.handright_thumb_pos.value, PICK_LENGTH = 0.05)
-        _mf_handleft_pick_result = self.calc_pick_result(PICK_MAT = self.handleft_thumb_pos.value, PICK_LENGTH = 0.05)
+        _mf_handright_pick_result = self.calc_pick_result(thumb = self.handright_thumb_pos.value, index = self.handright_index_pos.value, PICK_LENGTH = 0.05)
+        # _mf_handleft_pick_result = self.calc_pick_result(thumb = self.handleft_thumb_pos.value, index = self.handleft_index_pos.value, PICK_LENGTH = 0.05)
 
         ### todo: calculate cube position offset
         offset_mat = avango.gua.make_trans_mat(0.0,0.0,0.425)
+
+        if len(_mf_handright_pick_result.value) > 0:
+            print("Gotcha!!!!")
 
         # rot = index_finger.direction
         # This should be the quaternion rotation of -45 euler around x ( avango.gua.make_rot_mat( 0.92388,-0.38268,0,0) )
@@ -118,18 +121,20 @@ class LeapSensor(avango.script.Script):
         # print("x "+ str(pos.x) +"\ty "+ str(pos.y) +"\tz "+ str(pos.z))
         # self.sf_mat.value = mat
 
-    def calc_pick_result(self, PICK_MAT = avango.gua.make_identity_mat(), PICK_LENGTH = 1.0):
+    def calc_pick_result(self, thumb = avango.gua.make_identity_mat(), index = avango.gua.make_identity_mat(), PICK_LENGTH = 1.0):
         # update ray parameters
-        self.ray.Origin.value = PICK_MAT.get_translate()
+        self.ray.Origin.value = thumb.get_translate()
 
-        _vec = avango.gua.make_rot_mat(PICK_MAT.get_rotate_scale_corrected()) * avango.gua.Vec3(0.0,0.0,-1.0)
-        _vec = avango.gua.Vec3(_vec.x,_vec.y,_vec.z)
+        # _vec = avango.gua.make_rot_mat(PICK_MAT.get_rotate_scale_corrected()) * avango.gua.Vec3(0.0,0.0,-1.0)
+        # _vec = avango.gua.Vec3(_vec.x,_vec.y,_vec.z)
+
+        _vec = index.get_translate() - thumb.get_translate()
 
         self.ray.Direction.value = _vec * PICK_LENGTH
 
         # intersect
-        # _mf_pick_result = self.SCENEGRAPH.ray_test(self.ray, self.pick_options, self.white_list, self.black_list)
-        _mf_pick_result = None
+        _mf_pick_result = self.SCENEGRAPH.ray_test(self.ray, self.pick_options, self.white_list, self.black_list)
+        # _mf_pick_result = None
 
         return _mf_pick_result
 

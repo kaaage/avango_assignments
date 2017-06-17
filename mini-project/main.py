@@ -20,7 +20,8 @@ def start():
     scenegraph = avango.gua.nodes.SceneGraph(Name = "scenegraph")
 
     ## init scene
-    scene = Scene(PARENT_NODE = scenegraph.Root.value)
+    physics = avango.gua.nodes.Physics()
+    scene = Scene(SCENEGRAPH = scenegraph, PARENT_NODE = scenegraph.Root.value, PHYSICS = physics)
 
 
     ## init navigation technique
@@ -58,6 +59,7 @@ def start():
             WARP_MATRIX_RED_LEFT = "/opt/dlp-warpmatrices/dlp_6_warp_P1.warp",
             WARP_MATRIX_GREEN_LEFT = "/opt/dlp-warpmatrices/dlp_6_warp_P2.warp",
             WARP_MATRIX_BLUE_LEFT = "/opt/dlp-warpmatrices/dlp_6_warp_P3.warp",
+            PHYSICS = physics,
             )
 
         viewingSetup.init_user(HEADTRACKING_SENSOR_STATION = "tracking-dlp-glasses-1")
