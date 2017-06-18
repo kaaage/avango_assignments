@@ -101,7 +101,7 @@ class User:
         #self.pipeline_description.Passes.value.append(avango.gua.nodes.TexturedQuadPassDescription())
         self.pipeline_description.Passes.value.append(avango.gua.nodes.Video3DPassDescription())
         self.pipeline_description.Passes.value.append(avango.gua.nodes.LightVisibilityPassDescription())
-        #self.pipeline_description.Passes.value.append(avango.gua.nodes.BBoxPassDescription())
+        self.pipeline_description.Passes.value.append(avango.gua.nodes.BBoxPassDescription())
         self.pipeline_description.Passes.value.append(self.resolve_pass)
         self.pipeline_description.Passes.value.append(avango.gua.nodes.TexturedScreenSpaceQuadPassDescription())
         self.pipeline_description.Passes.value.append(avango.gua.nodes.SSAAPassDescription())
@@ -236,7 +236,6 @@ class MultiUserViewingSetup:
         self.viewer.DesiredFPS.value = 200.0 # in Hz
 
         self.viewer.Physics.value = PHYSICS
-
 
         ## init navigation node
         self.navigation_node = avango.gua.nodes.TransformNode(Name = "navigation_node")
