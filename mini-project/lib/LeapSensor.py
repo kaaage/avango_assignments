@@ -44,10 +44,12 @@ class LeapSensor(avango.script.Script):
     def my_constructor(self,
         # SCENE = None,
         SCENEGRAPH = None,
+        BASENODE = None,
         # NAVIGATION_NODE = None,
         TRACKING_TRANSMITTER_OFFSET = avango.gua.make_identity_mat(),
         ):
         self.SCENEGRAPH = SCENEGRAPH
+        self.BASENODE = BASENODE
         # self.SCENE = SCENE
 
         ### Picking ###
@@ -74,6 +76,10 @@ class LeapSensor(avango.script.Script):
         # Have the sample listener receive events from the controller
         self.controller.add_listener(self.listener)
 
+        self.leap_node = avango.gua.nodes.TransformNode(Name="leap_node")
+        self.leap_node.Transform.value = avango.gua.make_trans_mat(0.0, 0.06, 0.425) * avango.gua.make_rot_mat(-77.0, 1, 0, 0)
+        self.BASENODE.Children.value.append(self.leap_node)
+
         # Keep this process running until Enter is pressed
         # print("Press Enter to quit...")
         # try:
@@ -83,6 +89,24 @@ class LeapSensor(avango.script.Script):
         # finally:
         #     # Remove the sample listener when done
         #     controller.remove_listener(listener)
+
+        #tip visualization
+        _loader = avango.gua.nodes.TriMeshLoader() # get trimesh loader to load external meshes
+        self.thumb_sphere = avango.gua.nodes.TransformNode(Name="thumb_sphere")
+        self.thumb_sphere.Transform.value = self.handright_thumb_pos.value
+        self.thumb_sphere_geometry = _loader.create_geometry_from_file("thumb_sphere", "data/objects/sphere.obj", avango.gua.LoaderFlags.DEFAULTS)
+        self.thumb_sphere_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(1.0, 0.0, 0.0, 1.0))
+        self.thumb_sphere_geometry.Transform.value = avango.gua.make_scale_mat(0.02,0.02,0.02)
+        self.thumb_sphere.Children.value.append(self.thumb_sphere_geometry)
+        self.leap_node.Children.value.append(self.thumb_sphere)
+
+        self.index_sphere = avango.gua.nodes.TransformNode(Name="index_sphere")
+        self.index_sphere.Transform.value = self.handright_index_pos.value
+        self.index_sphere_geometry = _loader.create_geometry_from_file("index_sphere", "data/objects/sphere.obj", avango.gua.LoaderFlags.DEFAULTS)
+        self.index_sphere_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(1.0, 0.0, 0.0, 1.0))
+        self.index_sphere_geometry.Transform.value = avango.gua.make_scale_mat(0.02,0.02,0.02)
+        self.index_sphere.Children.value.append(self.index_sphere_geometry)
+        self.leap_node.Children.value.append(self.index_sphere)
 
         self.always_evaluate(True) # change global evaluation policy
 
@@ -96,24 +120,55 @@ class LeapSensor(avango.script.Script):
         # index_finger_list = hand_right.fingers.finger_type(Finger.TYPE_INDEX)
         # index_finger = index_finger_list[0]
 
-        self.handright_index_pos.value = get_leap_trans_mat(frame.hands.rightmost.fingers.finger_type(Finger.TYPE_INDEX)[0].tip_position)
-        self.handright_thumb_pos.value = get_leap_trans_mat(frame.hands.rightmost.fingers.finger_type(Finger.TYPE_THUMB)[0].tip_position)
+        self.handright_index_pos.value = self.get_leap_trans_mat(frame.hands.rightmost.fingers.finger_type(Finger.TYPE_INDEX)[0].tip_position)
+        self.handright_thumb_pos.value = self.get_leap_trans_mat(frame.hands.rightmost.fingers.finger_type(Finger.TYPE_THUMB)[0].tip_position)
 
-        self.handleft_index_pos.value = get_leap_trans_mat(frame.hands.leftmost.fingers.finger_type(Finger.TYPE_INDEX)[0].tip_position)
-        self.handleft_thumb_pos.value = get_leap_trans_mat(frame.hands.leftmost.fingers.finger_type(Finger.TYPE_THUMB)[0].tip_position)
+        self.handleft_index_pos.value = self.get_leap_trans_mat(frame.hands.leftmost.fingers.finger_type(Finger.TYPE_INDEX)[0].tip_position)
+        self.handleft_thumb_pos.value = self.get_leap_trans_mat(frame.hands.leftmost.fingers.finger_type(Finger.TYPE_THUMB)[0].tip_position)
 
         self.handright_pinch_strength = frame.hands.rightmost.pinch_strength
         self.handleft_pinch_strength = frame.hands.leftmost.pinch_strength
 
         ## calc intersections - picked cubes
-        _mf_handright_pick_result = self.calc_pick_result(thumb = self.handright_thumb_pos.value, index = self.handright_index_pos.value, PICK_LENGTH = 0.05)
+        # if (self.handright_pinch_strength > 0.8):
+        _mf_handright_pick_result = self.calc_pick_result(thumb = self.handright_thumb_pos.value, PICK_LENGTH = 0.1)
+        # if _mf_handright_pick_result != None:
+        # if len(_mf_handright_pick_result.value) > 0:
+        #     print(len(_mf_handright_pick_result.value))
+
+        if len(_mf_handright_pick_result.value) > 0: # intersection found
+            self.pick_result = _mf_handright_pick_result.value[0] # get first pick result
+            _node = self.pick_result.Object.value
+            print(_node)
+            _pick_world_pos = self.pick_result.WorldPosition.value # pick position in world coordinate system
+        else: # nothing hit
+            self.pick_result = None
+
+                # _mf_handright_pick_result.Transform.value = self.handright_index_pos.value
+                # if self.pick_result is not None: # something was hit
+                #     _node = self.pick_result.Object.value # get intersected geometry node
+                #     _node = _node.Parent.value # take the parent node of the geomtry node (the whole object)
+
+                #     self.start_dragging(_node)
+        
+        # if (self.handleft_pinch_strength > 0.8):
+        #     _mf_handleft_pick_result = self.calc_pick_result(thumb = self.handleft_thumb_pos.value, PICK_LENGTH = 0.05)
+        #     if _mf_handleft_pick_result != None:
+        #         # _mf_handleft_pick_result.Transform.value = self.handleft_index_pos.value
+        #         print(_mf_handleft_pick_result)
+
+        ## calc intersections - picked cubes
+        # _mf_handright_pick_result = self.calc_pick_result(thumb = self.handright_thumb_pos.value, index = self.handright_index_pos.value, PICK_LENGTH = 0.05)
         # _mf_handleft_pick_result = self.calc_pick_result(thumb = self.handleft_thumb_pos.value, index = self.handleft_index_pos.value, PICK_LENGTH = 0.05)
 
         ### todo: calculate cube position offset
-        offset_mat = avango.gua.make_trans_mat(0.0,0.0,0.425)
+        # offset_mat = avango.gua.make_trans_mat(0.0,0.0,0.425)
 
-        if len(_mf_handright_pick_result.value) > 0:
-            print("Gotcha!!!!")
+        self.thumb_sphere.Transform.value = self.handright_thumb_pos.value
+        self.index_sphere.Transform.value = self.handright_index_pos.value
+
+        # if len(_mf_handright_pick_result.value) > 0:
+        #     print("Gotcha!!!!")
 
         # rot = index_finger.direction
         # This should be the quaternion rotation of -45 euler around x ( avango.gua.make_rot_mat( 0.92388,-0.38268,0,0) )
@@ -121,14 +176,15 @@ class LeapSensor(avango.script.Script):
         # print("x "+ str(pos.x) +"\ty "+ str(pos.y) +"\tz "+ str(pos.z))
         # self.sf_mat.value = mat
 
-    def calc_pick_result(self, thumb = avango.gua.make_identity_mat(), index = avango.gua.make_identity_mat(), PICK_LENGTH = 1.0):
+    # def calc_pick_result(self, thumb = avango.gua.make_identity_mat(), index = avango.gua.make_identity_mat(), PICK_LENGTH = 1.0):
+    def calc_pick_result(self, thumb = avango.gua.make_identity_mat(), PICK_LENGTH = 0.1):
         # update ray parameters
         self.ray.Origin.value = thumb.get_translate()
 
-        # _vec = avango.gua.make_rot_mat(PICK_MAT.get_rotate_scale_corrected()) * avango.gua.Vec3(0.0,0.0,-1.0)
-        # _vec = avango.gua.Vec3(_vec.x,_vec.y,_vec.z)
+        _vec = avango.gua.make_rot_mat(thumb.get_rotate_scale_corrected()) * avango.gua.Vec3(0.0,0.0,-1.0)
+        _vec = avango.gua.Vec3(_vec.x,_vec.y,_vec.z)
 
-        _vec = index.get_translate() - thumb.get_translate()
+        # _vec = index.get_translate() - thumb.get_translate()
 
         self.ray.Direction.value = _vec * PICK_LENGTH
 
@@ -138,9 +194,15 @@ class LeapSensor(avango.script.Script):
 
         return _mf_pick_result
 
-def get_leap_trans_mat(pos):
-    # todo: add rotation 90 - ~15 = 75 grades around x axis counterclockwise
-    return avango.gua.make_trans_mat(avango.gua.Vec3(pos.x / 1000 , (-pos.z / 1000)-0.425, (pos.y / 1000))) * avango.gua.make_scale_mat(0.05,0.05,0.05)
+    def get_leap_trans_mat(self, pos):
+        transmat = avango.gua.make_trans_mat(avango.gua.Vec3(pos.x / 1000, (pos.y / 1000), (pos.z / 1000)))
+
+        # if (pos.x != 0 and pos.z != 0):
+        #     # print(pos)
+        #     print(transmat)
+        #     print(self.leap_node.Transform.value)
+
+        return transmat
 
 
 class SampleListener(leap.Leap.Listener):
