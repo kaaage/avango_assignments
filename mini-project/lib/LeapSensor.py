@@ -139,6 +139,7 @@ class LeapSensor(avango.script.Script):
         return _mf_pick_result
 
 def get_leap_trans_mat(pos):
+    # todo: add rotation 90 - ~15 = 75 grades around x axis counterclockwise
     return avango.gua.make_trans_mat(avango.gua.Vec3(pos.x / 1000 , (-pos.z / 1000)-0.425, (pos.y / 1000))) * avango.gua.make_scale_mat(0.05,0.05,0.05)
 
 

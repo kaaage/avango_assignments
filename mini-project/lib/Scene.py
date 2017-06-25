@@ -90,10 +90,10 @@ class Scene:
 
         PHYSICS.Gravity.value = avango.gua.Vec3(0.0, -0.45, 0.0)
 
-        #self.cube1_node = avango.gua.nodes.TransformNode(Name="cube1_node")
-        #self.cube1_node.Transform.value = avango.gua.make_trans_mat(0.0, 0.5, 0.0) * avango.gua.make_scale_mat(0.01,0.01,0.01)
-        #self.cube1_geometry = _loader.create_geometry_from_file("cube1_geometry", "data/objects/cube.obj", avango.gua.LoaderFlags.DEFAULTS)
-        #self.cube1_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(1.0, 0.0, 0.0, 1.0))
+        self.cube1_node = avango.gua.nodes.TransformNode(Name="cube1_node")
+        self.cube1_node.Transform.value = avango.gua.make_trans_mat(0.0, 0.5, 0.0) * avango.gua.make_scale_mat(0.01,0.01,0.01)
+        self.cube1_geometry = _loader.create_geometry_from_file("cube1_geometry", "data/objects/cube.obj", avango.gua.LoaderFlags.DEFAULTS)
+        self.cube1_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(1.0, 0.0, 0.0, 1.0))
 
         #self.cube2_node = avango.gua.nodes.TransformNode(Name="cube2_node")
         #self.cube2_node.Transform.value = avango.gua.make_trans_mat(0.0, 0.5, 0.0) * avango.gua.make_scale_mat(0.01,0.01,0.01)
@@ -101,9 +101,9 @@ class Scene:
         #self.cube2_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(1.0, 0.0, 0.0, 1.0))
 
 
-        #leap = LeapSensor()
-        #leap.my_constructor(SCENEGRAPH = self.SCENEGRAPH)
-        #self.cube1_node.Transform.connect_from(leap.handright_index_pos)
+        leap = LeapSensor()
+        leap.my_constructor(SCENEGRAPH = self.SCENEGRAPH)
+        self.cube1_node.Transform.connect_from(leap.handright_index_pos)
         #self.cube2_node.Transform.connect_from(leap.handright_thumb_pos)
 
 
@@ -130,13 +130,13 @@ class Scene:
             "floor_geometry", "data/objects/plane.obj",
             avango.gua.LoaderFlags.NORMALIZE_SCALE | avango.gua.LoaderFlags.NORMALIZE_POSITION)
 
-        floor_geometry.Transform.value = avango.gua.make_scale_mat(0.6, 0.1, 0.4)
+        floor_geometry.Transform.value = avango.gua.make_scale_mat(0.5, 0.1, 0.4)
         floor_geometry.Material.value.set_uniform("Metalness", 0.0)
         floor_geometry.Material.value.set_uniform("RoughnessMap", "data/textures/oakfloor2_roughness.png")
         floor_geometry.Material.value.set_uniform("ColorMap", "data/textures/oakfloor2_basecolor.png")
         floor_geometry.Material.value.set_uniform("NormalMap", "data/textures/oakfloor2_normal.png")
 
-        avango.gua.create_box_shape("box", avango.gua.Vec3(0.6, 0.1, 0.4))
+        avango.gua.create_box_shape("box", avango.gua.Vec3(0.5, 0.1, 0.4))
         floor_collision_shape = avango.gua.nodes.CollisionShapeNode(
             Name="floor_collision_shape",
             ShapeName="box",
@@ -144,7 +144,7 @@ class Scene:
         floor_body = avango.gua.nodes.RigidBodyNode(
             Name="floor_body",
             Mass=0,
-            Transform=avango.gua.make_trans_mat(0.0, -1.0, 0.0),
+            Transform=avango.gua.make_trans_mat(0.0, 0.0, 0.0),
             Friction=0.5,
             Restitution=0.7,
             DisplayBoundingBox=True,
