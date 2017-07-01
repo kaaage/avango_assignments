@@ -15,9 +15,11 @@ import avango.daemon
 
 # import lib.Leap as Leap
 import leap.Leap, sys, _thread, time
-from leap.Leap import CircleGesture, KeyTapGesture, ScreenTapGesture, SwipeGesture, Finger
+from leap.Leap import CircleGesture, KeyTapGesture, ScreenTapGesture, SwipeGesture, Finger, Vector
 import time
 
+# import numpy as np
+import math
 
 class LeapSensor(avango.script.Script):
 
@@ -29,6 +31,7 @@ class LeapSensor(avango.script.Script):
     handleft_pinch_strength = 0
 
     handright_pos = avango.gua.SFMatrix4()
+    handright_rot = avango.gua.SFMatrix4()
     handright_index_pos = avango.gua.SFMatrix4()
     handright_thumb_pos = avango.gua.SFMatrix4()
 
@@ -78,6 +81,7 @@ class LeapSensor(avango.script.Script):
 
         self.leap_node = avango.gua.nodes.TransformNode(Name="leap_node")
         self.leap_node.Transform.value = avango.gua.make_trans_mat(0.0, 0.06, 0.425) * avango.gua.make_rot_mat(-77.0, 1, 0, 0)
+
         self.BASENODE.Children.value.append(self.leap_node)
 
         # Keep this process running until Enter is pressed
@@ -108,10 +112,40 @@ class LeapSensor(avango.script.Script):
         self.index_sphere.Children.value.append(self.index_sphere_geometry)
         self.leap_node.Children.value.append(self.index_sphere)
 
+        #visualization of pick ray
+        self.ray_trans = avango.gua.nodes.TransformNode(Name="ray_trans")
+        self.ray_geometry = _loader.create_geometry_from_file("ray_geometry", "data/objects/cylinder.obj", avango.gua.LoaderFlags.DEFAULTS)
+        self.ray_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(1.0,0.0,0.0,1.0))
+        self.ray_geometry.Transform.value = \
+             avango.gua.make_trans_mat(0.0,0.0,0.0) * \
+             avango.gua.make_scale_mat(0.005, 0.1, 0.005)
+        self.ray_trans.Children.value.append(self.ray_geometry)
+
         self.always_evaluate(True) # change global evaluation policy
 
     def evaluate(self):
         frame = self.controller.frame()
+
+        self.handright_index_pos.value = self.get_leap_trans_mat(frame.hands.rightmost.fingers.finger_type(Finger.TYPE_INDEX)[0].tip_position)
+        self.handright_thumb_pos.value = self.get_leap_trans_mat(frame.hands.rightmost.fingers.finger_type(Finger.TYPE_THUMB)[0].tip_position)
+
+        self.handleft_index_pos.value = self.get_leap_trans_mat(frame.hands.leftmost.fingers.finger_type(Finger.TYPE_INDEX)[0].tip_position)
+        self.handleft_thumb_pos.value = self.get_leap_trans_mat(frame.hands.leftmost.fingers.finger_type(Finger.TYPE_THUMB)[0].tip_position)
+
+
+        self.hand_right = frame.hands.rightmost
+        self.rot_x = math.degrees(self.hand_right.direction.pitch)
+        self.rot_y = math.degrees(self.hand_right.direction.yaw)
+        self.rot_z = math.degrees(self.hand_right.palm_normal.roll)
+       
+        handright_rot = avango.gua.make_rot_mat(self.rot_x, 1.0, 0.0, 0.0) *  avango.gua.make_rot_mat(self.rot_y, 0.0, 1.0, 0.0) * avango.gua.make_rot_mat(self.rot_z, 0.0, 0.0, 1.0)
+
+
+        print("x " +str(self.rot_x) +"\ty " +str(self.rot_y) +"\tz " + str(self.rot_z))
+
+        self.handright_pinch_strength = frame.hands.rightmost.pinch_strength
+        self.handleft_pinch_strength = frame.hands.leftmost.pinch_strength
+
         # print("Frame id: %d, timestamp: %d, hands: %d, fingers: %d, tools: %d, gestures: %d" % (
         #       frame.id, frame.timestamp, len(frame.hands), len(frame.fingers), len(frame.tools), len(frame.gestures())))
 
@@ -120,18 +154,31 @@ class LeapSensor(avango.script.Script):
         # index_finger_list = hand_right.fingers.finger_type(Finger.TYPE_INDEX)
         # index_finger = index_finger_list[0]
 
-        self.handright_index_pos.value = self.get_leap_trans_mat(frame.hands.rightmost.fingers.finger_type(Finger.TYPE_INDEX)[0].tip_position)
-        self.handright_thumb_pos.value = self.get_leap_trans_mat(frame.hands.rightmost.fingers.finger_type(Finger.TYPE_THUMB)[0].tip_position)
+        # self.cur_frame = self.thumb_sphere.Transform.value * avango.gua.make_inverse_mat(self.last_frame)
+        # _trans = self.cur_frame.get_translate()
+        # rot_x = frame.hands.rightmost.rotation_angle(self.controller.frame(1), Vector.x_axis) * 180 / math.pi
+        # rot_y = frame.hands.rightmost.rotation_angle(self.controller.frame(1), Vector.y_axis) * 180 / math.pi
+        # rot_z = frame.hands.rightmost.rotation_angle(self.controller.frame(1), Vector.z_axis) * 180 / math.pi
+        #print(frame.hands.rightmost.rotation_angle(self.controller.frame(1)))
 
-        self.handleft_index_pos.value = self.get_leap_trans_mat(frame.hands.leftmost.fingers.finger_type(Finger.TYPE_INDEX)[0].tip_position)
-        self.handleft_thumb_pos.value = self.get_leap_trans_mat(frame.hands.leftmost.fingers.finger_type(Finger.TYPE_THUMB)[0].tip_position)
+        # _rot = avango.gua.make_rot_mat(rot_x, 1.0, 0.0, 0.0) * _rot = avango.gua.make_rot_mat(rot_y, 0.0, 1.0, 0.0) * _rot = avango.gua.make_rot_mat(rot_z, 0.0, 0.0, 1.0)
 
-        self.handright_pinch_strength = frame.hands.rightmost.pinch_strength
-        self.handleft_pinch_strength = frame.hands.leftmost.pinch_strength
+        self.thumb_sphere.Transform.value = self.handright_thumb_pos.value #* avango.gua.make_rot_mat(_rot)
+        self.index_sphere.Transform.value = self.handright_index_pos.value
+
+        # _rot = frame.hands.rightmost.rotation_matrix(self.controller.frame(0))
+        # self.thumb_sphere.Transform.value = self.thumb_sphere.Transform.value * avango.gua.make_rot_mat(_rot)
+        # self.thumb_sphere.Transform.value = self.thumb_sphere.Transform.value * avango.gua.make_trans_mat(_trans.x, _trans.y, _trans.z) \
+        #     * _rot
+
+        # self.last_frame = self.thumb_sphere.Transform.value
+
+
+
 
         ## calc intersections - picked cubes
         # if (self.handright_pinch_strength > 0.8):
-        _mf_handright_pick_result = self.calc_pick_result(thumb = self.handright_thumb_pos.value, PICK_LENGTH = 0.1)
+        _mf_handright_pick_result = self.calc_pick_result(thumb = self.thumb_sphere.WorldTransform.value, index = self.handright_index_pos.value, PICK_LENGTH = 0.1)
         # if _mf_handright_pick_result != None:
         # if len(_mf_handright_pick_result.value) > 0:
         #     print(len(_mf_handright_pick_result.value))
@@ -139,7 +186,7 @@ class LeapSensor(avango.script.Script):
         if len(_mf_handright_pick_result.value) > 0: # intersection found
             self.pick_result = _mf_handright_pick_result.value[0] # get first pick result
             _node = self.pick_result.Object.value
-            print(_node)
+            #print(_node)
             _pick_world_pos = self.pick_result.WorldPosition.value # pick position in world coordinate system
         else: # nothing hit
             self.pick_result = None
@@ -164,8 +211,8 @@ class LeapSensor(avango.script.Script):
         ### todo: calculate cube position offset
         # offset_mat = avango.gua.make_trans_mat(0.0,0.0,0.425)
 
-        self.thumb_sphere.Transform.value = self.handright_thumb_pos.value
-        self.index_sphere.Transform.value = self.handright_index_pos.value
+
+        # self.ray_trans.Transform.value = avango.gua.make_rot_mat(-90,0,1,0)
 
         # if len(_mf_handright_pick_result.value) > 0:
         #     print("Gotcha!!!!")
@@ -176,21 +223,40 @@ class LeapSensor(avango.script.Script):
         # print("x "+ str(pos.x) +"\ty "+ str(pos.y) +"\tz "+ str(pos.z))
         # self.sf_mat.value = mat
 
-    # def calc_pick_result(self, thumb = avango.gua.make_identity_mat(), index = avango.gua.make_identity_mat(), PICK_LENGTH = 1.0):
-    def calc_pick_result(self, thumb = avango.gua.make_identity_mat(), PICK_LENGTH = 0.1):
+    def calc_pick_result(self, thumb = avango.gua.make_identity_mat(), index = avango.gua.make_identity_mat(), PICK_LENGTH = 0.1):
+    # def calc_pick_result(self, thumb = avango.gua.make_identity_mat(), PICK_LENGTH = 0.1):
         # update ray parameters
-        self.ray.Origin.value = thumb.get_translate()
+        thumb_pos = thumb.get_translate()
+        # index_pos = index.get_translate()
+
+        # ray_vector = index_pos - thumb_pos
+        # ray_length = ray_vector.length()
+
+        # if (ray_length > 0):
+        #     print(ray_vector)
+        #     print(ray_length)
+
+        self.ray.Origin.value = thumb_pos
 
         _vec = avango.gua.make_rot_mat(thumb.get_rotate_scale_corrected()) * avango.gua.Vec3(0.0,0.0,-1.0)
         _vec = avango.gua.Vec3(_vec.x,_vec.y,_vec.z)
+      
+        # _vec = avango.gua.make_rot_mat(thumb.get_rotate_scale_corrected()) * ray_vector
+        # _vec = avango.gua.Vec3(_vec.x,_vec.y,_vec.z)
 
         # _vec = index.get_translate() - thumb.get_translate()
 
         self.ray.Direction.value = _vec * PICK_LENGTH
+        # self.ray.Direction.value = _vec * ray_length
 
         # intersect
         _mf_pick_result = self.SCENEGRAPH.ray_test(self.ray, self.pick_options, self.white_list, self.black_list)
         # _mf_pick_result = None
+
+        #VISUALIZE RAY
+        self.ray_trans.Transform.value = avango.gua.make_trans_mat(self.ray.Origin.value) 
+        #print(self.ray.Origin.value)
+        # self.thumb_sphere.Children.value.append(self.ray_trans)
 
         return _mf_pick_result
 
@@ -339,3 +405,34 @@ class SampleListener(leap.Leap.Listener):
 
     #     if state == Leap.Gesture.STATE_INVALID:
     #         return "STATE_INVALID"
+
+def dotproduct(v1, v2):
+  return sum((a*b) for a, b in zip(v1, v2))
+
+def length(v):
+  return math.sqrt(dotproduct(v, v))
+
+def angle(v1, v2):
+  return math.acos(dotproduct(v1, v2) / (length(v1) * length(v2)))
+
+def rotation_matrix(axis, theta):
+    """
+    Return the rotation matrix associated with counterclockwise rotation about
+    the given axis by theta radians.
+    """
+    axis = np.asarray(axis)
+    axis = axis/math.sqrt(np.dot(axis, axis))
+    a = math.cos(theta/2.0)
+    b, c, d = -axis*math.sin(theta/2.0)
+    aa, bb, cc, dd = a*a, b*b, c*c, d*d
+    bc, ad, ac, ab, bd, cd = b*c, a*d, a*c, a*b, b*d, c*d
+    return np.array([[aa+bb-cc-dd, 2*(bc+ad), 2*(bd-ac)],
+                     [2*(bc-ad), aa+cc-bb-dd, 2*(cd+ab)],
+                     [2*(bd+ac), 2*(cd-ab), aa+dd-bb-cc]])
+
+v = [3, 5, 0]
+axis = [4, 4, 1]
+theta = 1.2 
+
+# print(np.dot(rotation_matrix(axis,theta), v)) 
+# [ 2.74911638  4.77180932  1.91629719]
