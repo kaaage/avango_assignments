@@ -6,6 +6,7 @@ import avango.gua
 import avango.script
 from avango.script import field_has_changed
 import avango.daemon
+import math
 
 ### import application libraries
 
@@ -69,6 +70,9 @@ class LeapSensor(avango.script.Script):
         self.leap_node.Transform.value = avango.gua.make_trans_mat(0.0, 0.06, 0.44) * avango.gua.make_rot_mat(-77.0, 1, 0, 0)
         self.BASENODE.Children.value.append(self.leap_node)
 
+        self.leap_node_rot = avango.gua.nodes.TransformNode(Name="leap_node")
+        self.leap_node.Children.value.append(self.leap_node_rot)
+
         # Finger tips visualization
         _loader = avango.gua.nodes.TriMeshLoader() # get trimesh loader to load external meshes
         self.thumb_sphere = avango.gua.nodes.TransformNode(Name="thumb_sphere")
@@ -98,30 +102,39 @@ class LeapSensor(avango.script.Script):
         self.handleft_index_pos.value = self.get_leap_trans_mat(frame.hands.leftmost.fingers.finger_type(Finger.TYPE_INDEX)[0].tip_position)
         self.handleft_thumb_pos.value = self.get_leap_trans_mat(frame.hands.leftmost.fingers.finger_type(Finger.TYPE_THUMB)[0].tip_position)
 
+        self.hand_right = frame.hands.rightmost
+        self.rot_x = math.degrees(self.hand_right.direction.pitch)
+        self.rot_y = math.degrees(self.hand_right.direction.yaw)
+        self.rot_z = math.degrees(self.hand_right.palm_normal.roll)
+
+        handright_rot = avango.gua.make_rot_mat(self.rot_x, 1.0, 0.0, 0.0) *  avango.gua.make_rot_mat(self.rot_y, 0.0, 1.0, 0.0) * avango.gua.make_rot_mat(self.rot_z, 0.0, 0.0, 1.0)
+
         self.handright_pinch_strength = frame.hands.rightmost.pinch_strength
         self.handleft_pinch_strength = frame.hands.leftmost.pinch_strength
 
-        self.thumb_sphere.Transform.value = self.handright_thumb_pos.value
+        self.leap_node_rot.Transform.value = handright_rot
+        self.thumb_sphere.Transform.value = self.handright_thumb_pos.value * avango.gua.make_rot_mat(self.leap_node.Transform.value.get_rotate_scale_corrected())
         self.index_sphere.Transform.value = self.handright_index_pos.value
 
+        #check if to drag
         _pos = self.thumb_sphere.WorldTransform.value.get_translate() # world position of thumb_sphere
         for _node in self.TARGET_LIST: # iterate over all target nodes
             _bb = _node.BoundingBox.value # get bounding box of a node
             _rigid_body = _node.Parent.value.Parent.value
 
+            print(_rigid_body.IsKinematic.value)
+
             if _bb.contains(_pos) == True: # hook inside bounding box of this node
                 _node.Material.value.set_uniform("Color", avango.gua.Vec4(0.0,1.0,0.0,0.85)) # highlight color
-                # print(_rigid_body.IsKinematic.value)
-                if self.handright_pinch_strength >= self.pinch_threshold:
-                    _rigid_body.IsKinematic.value = False
-                    # _rigid_body.Transform.value = self.thumb_sphere.Transform.value
-                    self.start_dragging(_node)
+                self.start_dragging(_rigid_body)
             else:
                 _node.Material.value.set_uniform("Color", avango.gua.Vec4(1.0,0.0,0.0,1.0)) # default color
-                if self.handright_pinch_strength < self.pinch_threshold:
-                    self.stop_dragging()
-                    _rigid_body.IsKinematic.value = True
 
+        if self.handright_pinch_strength < self.pinch_threshold and self.dragged_node is not None:
+            self.stop_dragging()
+
+        ## possibly update object dragging
+        self.dragging()
 
     def get_leap_trans_mat(self, pos):
         transmat = avango.gua.make_trans_mat(avango.gua.Vec3(pos.x / 1000, (pos.y / 1000), (pos.z / 1000)))
@@ -130,10 +143,12 @@ class LeapSensor(avango.script.Script):
 
     def start_dragging(self, NODE):
         self.dragged_node = NODE        
+        # self.dragged_node.IsKinematic.value = False
         self.dragging_offset_mat = avango.gua.make_inverse_mat(self.thumb_sphere.WorldTransform.value) * self.dragged_node.WorldTransform.value # object transformation in pointer coordinate system
 
   
     def stop_dragging(self): 
+        # self.dragged_node.IsKinematic.value = True
         self.dragged_node = None
         self.dragging_offset_mat = avango.gua.make_identity_mat()
 
