@@ -46,8 +46,10 @@ class Scene:
         self.base_node = avango.gua.nodes.TransformNode(Name="base_node")
         # self.base_node.Transform.value = avango.gua.make_trans_mat(-2.1, 0.96, 0.705) * avango.gua.make_rot_mat(90.0, 0, 1, 0) * \
         #     avango.gua.make_rot_mat(90.0, 1, 0, 0) * avango.gua.make_rot_mat(90.0, -1, 0, 0)
-        self.base_node.Transform.value = avango.gua.make_trans_mat(-2.1, 0.96, 0.705) * avango.gua.make_rot_mat(90.0, -1, 0, 0)
+        self.base_node.Transform.value = avango.gua.make_trans_mat(-2.1, 0.96, 0.705) * avango.gua.make_rot_mat(90.0, 0, 1, 0)
         PARENT_NODE.Children.value.append(self.base_node)
+
+        self.cube_list = []
 
         # self.cube_node_static = avango.gua.nodes.TransformNode(Name="cube_node_static")
         # self.cube_node_static.Transform.value = avango.gua.make_trans_mat(0.0, 0.0, 0.0) * avango.gua.make_scale_mat(0.05,0.05,0.05)
@@ -65,8 +67,10 @@ class Scene:
 
         self.cube_geometry = _loader.create_geometry_from_file("cube_geometry", "data/objects/cube.obj", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.MAKE_PICKABLE)
         self.cube_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(1.0, 0.0, 0.0, 1.0))
-        self.cube_geometry.Transform.value = avango.gua.make_scale_mat(0.05,0.05,0.05)
+        self.cube_geometry.Transform.value = avango.gua.make_scale_mat(0.08,0.08,0.08)
         # self.cube_node.Children.value.append(self.cube)
+
+        self.cube_list.append(self.cube_geometry)
 
         self.cube_body = avango.gua.nodes.RigidBodyNode(
             Name="cube_body",
@@ -76,9 +80,9 @@ class Scene:
             Restitution=0.7,
             DisplayBoundingBox=True,
             #LinearVelocity = avango.gua.Vec3(0.0,-1.0,0.0),
-            Transform = avango.gua.make_trans_mat(0.0, 0.5, 0.0))
+            Transform = avango.gua.make_trans_mat(0.0, 0.4, 0.4))
 
-        avango.gua.create_box_shape("box", avango.gua.Vec3(0.05,0.05,0.05))
+        avango.gua.create_box_shape("box", avango.gua.Vec3(0.08,0.08,0.08))
         # avango.gua.create_sphere_shape("cube", 0.05)
         self.cube_col_shape = avango.gua.nodes.CollisionShapeNode(
             Name="cube_col_shape",
@@ -103,7 +107,7 @@ class Scene:
 
 
         leap = LeapSensor()
-        leap.my_constructor(SCENEGRAPH = self.SCENEGRAPH, BASENODE = self.base_node)
+        leap.my_constructor(SCENEGRAPH = self.SCENEGRAPH, BASENODE = self.base_node, TARGET_LIST = self.cube_list)
         # self.cube1_node.Transform.connect_from(leap.handright_index_pos)
         #self.cube2_node.Transform.connect_from(leap.handright_thumb_pos)
 
