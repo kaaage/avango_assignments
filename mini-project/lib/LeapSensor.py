@@ -77,7 +77,7 @@ class LeapSensor(avango.script.Script):
         self.controller.add_listener(self.listener)
 
         self.leap_node = avango.gua.nodes.TransformNode(Name="leap_node")
-        self.leap_node.Transform.value = avango.gua.make_trans_mat(0.0, 0.06, 0.425) * avango.gua.make_rot_mat(-77.0, 1, 0, 0)
+        self.leap_node.Transform.value = avango.gua.make_trans_mat(0.0, 0.06, 0.44) * avango.gua.make_rot_mat(-77.0, 1, 0, 0)
         self.BASENODE.Children.value.append(self.leap_node)
 
         # Keep this process running until Enter is pressed

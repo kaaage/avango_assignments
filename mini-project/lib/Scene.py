@@ -44,8 +44,9 @@ class Scene:
         _loader = avango.gua.nodes.TriMeshLoader() # get trimesh loader to load external meshes
 
         self.base_node = avango.gua.nodes.TransformNode(Name="base_node")
-        self.base_node.Transform.value = avango.gua.make_trans_mat(-2.1, 0.96, 0.705) * avango.gua.make_rot_mat(90.0, 0, 1, 0) * \
-            avango.gua.make_rot_mat(90.0, 1, 0, 0) * avango.gua.make_rot_mat(90.0, -1, 0, 0)
+        # self.base_node.Transform.value = avango.gua.make_trans_mat(-2.1, 0.96, 0.705) * avango.gua.make_rot_mat(90.0, 0, 1, 0) * \
+        #     avango.gua.make_rot_mat(90.0, 1, 0, 0) * avango.gua.make_rot_mat(90.0, -1, 0, 0)
+        self.base_node.Transform.value = avango.gua.make_trans_mat(-2.1, 0.96, 0.705) * avango.gua.make_rot_mat(90.0, -1, 0, 0)
         PARENT_NODE.Children.value.append(self.base_node)
 
         # self.cube_node_static = avango.gua.nodes.TransformNode(Name="cube_node_static")
