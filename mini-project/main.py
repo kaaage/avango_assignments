@@ -53,12 +53,12 @@ def start():
             RIGHT_POSITION = avango.gua.Vec2ui(1400, 0),
             RIGHT_RESOLUTION = avango.gua.Vec2ui(1400, 1050),
             DISPLAY_STRING_LIST = [[":0.0"], [":0.1"], [":0.2"]], # 3 user slots (left and right eye on same GPU)
-            WARP_MATRIX_RED_RIGHT = "/opt/dlp-warpmatrices/dlp_6_warp_P1.warp",
-            WARP_MATRIX_GREEN_RIGHT = "/opt/dlp-warpmatrices/dlp_6_warp_P2.warp",
-            WARP_MATRIX_BLUE_RIGHT = "/opt/dlp-warpmatrices/dlp_6_warp_P3.warp",
-            WARP_MATRIX_RED_LEFT = "/opt/dlp-warpmatrices/dlp_6_warp_P1.warp",
-            WARP_MATRIX_GREEN_LEFT = "/opt/dlp-warpmatrices/dlp_6_warp_P2.warp",
-            WARP_MATRIX_BLUE_LEFT = "/opt/dlp-warpmatrices/dlp_6_warp_P3.warp",
+            WARP_MATRIX_RED_RIGHT = "/opt/3D43-warpmatrices/3D43_warp_P1.warp",
+            WARP_MATRIX_GREEN_RIGHT = "/opt/3D43-warpmatrices/3D43_warp_P2.warp",
+            WARP_MATRIX_BLUE_RIGHT = "/opt/3D43-warpmatrices/3D43_warp_P3.warp",
+            WARP_MATRIX_RED_LEFT = "/opt/3D43-warpmatrices/3D43_warp_P1.warp",
+            WARP_MATRIX_GREEN_LEFT = "/opt/3D43-warpmatrices/3D43_warp_P2.warp",
+            WARP_MATRIX_BLUE_LEFT = "/opt/3D43-warpmatrices/3D43_warp_P3.warp",
             PHYSICS = physics,
             )
 

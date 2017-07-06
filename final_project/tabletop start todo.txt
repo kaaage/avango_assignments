@@ -8,15 +8,17 @@ medusa
 
 syncbox
 
-start projectors:
-cd /opt/3D43-TCP_CTRL
-./start3D43.sh
-
 genlock:
 cd /opt/client/dlp-tools
 ./genlock_3_m6000.sh
 
 2d white power switch (video multiplexers)
+
+start projectors:
+cd /opt/3D43-TCP_CTRL
+./start3D43.sh
+
+
 
 in web browser http://medusa.medien.uni-weimar.de/ "load color tables"
 
