@@ -184,7 +184,6 @@ class MultiUserViewingSetup:
         WARP_MATRIX_GREEN_LEFT = "",
         WARP_MATRIX_BLUE_LEFT = "",
         BLACK_LIST = [],
-        PHYSICS = None,
         ):
 
 
@@ -234,8 +233,6 @@ class MultiUserViewingSetup:
         self.viewer.SceneGraphs.value = [self.SCENEGRAPH]
         #self.viewer.Windows.value = [self.window]
         self.viewer.DesiredFPS.value = 200.0 # in Hz
-
-        self.viewer.Physics.value = PHYSICS
 
         ## init navigation node
         self.navigation_node = avango.gua.nodes.TransformNode(Name = "navigation_node")

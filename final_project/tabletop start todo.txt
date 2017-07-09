@@ -8,13 +8,15 @@ medusa
 
 syncbox
 
-start projectors:
-cd /opt/3D43-TCP_CTRL
-./start3D43.sh
 
 genlock:
 cd /opt/client/dlp-tools
 ./genlock_3_m6000.sh
+
+start projectors:
+cd /opt/3D43-TCP_CTRL
+./start3D43.sh
+
 
 2d white power switch (video multiplexers)
 

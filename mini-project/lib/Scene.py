@@ -14,7 +14,6 @@ class Scene:
     def __init__(self,
         SCENEGRAPH = None,
         PARENT_NODE = None,
-        PHYSICS = None,
         ):
 
         ### external reference ###
@@ -58,43 +57,17 @@ class Scene:
         # self.cube_node_static.Children.value.append(self.cube_static)
         # self.base_node.Children.value.append(self.cube_node_static)
 
-        floor = self.create_floor(_loader)
-        PHYSICS.add_rigid_body(floor)
-        self.base_node.Children.value.append(floor)
-
         # self.cube_node = avango.gua.nodes.TransformNode(Name="cube_node")
-        # self.cube_node.Transform.value = avango.gua.make_trans_mat(0.0, 0.5, 0.0) * avango.gua.make_scale_mat(0.05,0.05,0.05)
+        # self.cube_node.Transform.value = avango.gua.make_trans_mat(0.0, 0.1, 0.0)
 
-        self.cube_geometry = _loader.create_geometry_from_file("cube_geometry", "data/objects/cube.obj", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.MAKE_PICKABLE)
-        self.cube_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(1.0, 0.0, 0.0, 1.0))
-        self.cube_geometry.Transform.value = avango.gua.make_trans_mat(0.0, 0.0, 0.0) * avango.gua.make_scale_mat(0.08,0.08,0.08)
-        # self.cube_node.Children.value.append(self.cube)
+        # self.cube_geometry = _loader.create_geometry_from_file("cube_geometry", "data/objects/cube.obj", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.MAKE_PICKABLE)
+        # self.cube_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(1.0, 0.0, 0.0, 1.0))
+        # self.cube_geometry.Transform.value = avango.gua.make_trans_mat(0.0, 0.0, 0.0) * avango.gua.make_scale_mat(0.05,0.05,0.05)
+        # self.cube_node.Children.value.append(self.cube_geometry)
 
-        self.cube_list.append(self.cube_geometry)
+        # self.cube_list.append(self.cube_geometry)
 
-        self.cube_body = avango.gua.nodes.RigidBodyNode(
-            Name="cube_body",
-            # IsKinematic=True,
-            Mass=0.5,
-            Friction=1.0,
-            RollingFriction=1.0,
-            Restitution=0.0,
-            DisplayBoundingBox=True,
-            #LinearVelocity = avango.gua.Vec3(0.0,-1.0,0.0),
-            Transform = avango.gua.make_trans_mat(0.0, 0.5, 0.0))
-
-        avango.gua.create_box_shape("box", avango.gua.Vec3(0.08,0.08,0.08))
-        # avango.gua.create_sphere_shape("cube", 0.05)
-        self.cube_col_shape = avango.gua.nodes.CollisionShapeNode(
-            Name="cube_col_shape",
-            ShapeName="box")
-
-        self.cube_col_shape.Children.value.append(self.cube_geometry)
-        self.cube_body.Children.value.append(self.cube_col_shape)
-        self.base_node.Children.value.append(self.cube_body)
-        PHYSICS.add_rigid_body(self.cube_body)
-
-        PHYSICS.Gravity.value = avango.gua.Vec3(0.0, -0.45, 0.0)
+        # self.base_node.Children.value.append(self.cube_node)
 
         # self.cube1_node = avango.gua.nodes.TransformNode(Name="cube1_node")
         # self.cube1_node.Transform.value = avango.gua.make_trans_mat(0.0, 0.5, 0.0) * avango.gua.make_scale_mat(0.01,0.01,0.01)
@@ -129,31 +102,3 @@ class Scene:
         for _node in self.PARENT_NODE.Children.value:
             if _node.has_field("HomeMatrix") == True:
                 _node.Transform.value = _node.HomeMatrix.value
-                
-
-    def create_floor(self, loader):
-        floor_geometry = loader.create_geometry_from_file(
-            "floor_geometry", "data/objects/plane.obj",
-            avango.gua.LoaderFlags.NORMALIZE_SCALE | avango.gua.LoaderFlags.NORMALIZE_POSITION)
-
-        floor_geometry.Transform.value = avango.gua.make_trans_mat(0.0, 0.0, 0.0) * avango.gua.make_scale_mat(10.0, 10.0, 10.0)
-        floor_geometry.Material.value.set_uniform("Metalness", 0.0)
-        floor_geometry.Material.value.set_uniform("RoughnessMap", "data/textures/oakfloor2_roughness.png")
-        floor_geometry.Material.value.set_uniform("ColorMap", "data/textures/oakfloor2_basecolor.png")
-        floor_geometry.Material.value.set_uniform("NormalMap", "data/textures/oakfloor2_normal.png")
-
-        avango.gua.create_box_shape("box", avango.gua.Vec3(10.0, 10.0, 10.0))
-        floor_collision_shape = avango.gua.nodes.CollisionShapeNode(
-            Name="floor_collision_shape",
-            ShapeName="box",
-            Children=[floor_geometry])
-        floor_body = avango.gua.nodes.RigidBodyNode(
-            Name="floor_body",
-            Mass=0,
-            Transform=avango.gua.make_trans_mat(0.0, 0.0, 0.0),
-            Friction=0.5,
-            Restitution=0.7,
-            DisplayBoundingBox=True,
-            Children=[floor_collision_shape])
-    
-        return floor_body
