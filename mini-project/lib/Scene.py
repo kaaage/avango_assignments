@@ -80,8 +80,6 @@ class Scene:
         #self.cube2_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(1.0, 0.0, 0.0, 1.0))
 
 
-        leap = LeapSensor()
-        leap.my_constructor(SCENEGRAPH = self.SCENEGRAPH, BASENODE = self.base_node, TARGET_LIST = self.cube_list)
         # self.cube1_node.Transform.connect_from(leap.handright_index_pos)
         #self.cube2_node.Transform.connect_from(leap.handright_thumb_pos)
 

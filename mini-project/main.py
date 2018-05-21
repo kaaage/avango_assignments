@@ -9,8 +9,9 @@ from lib.ViewingSetup import StereoViewingSetup
 from lib.MultiUserViewingSetup import MultiUserViewingSetup
 from lib.Scene import Scene
 from lib.Device import NewSpacemouseInput
+from lib.Device import KeyboardInput
 from lib.Navigation import SteeringNavigation
-# from lib.Manipulation import ManipulationManager
+from lib.Manipulation import ManipulationManager
 from lib.LeapSensor import LeapSensor
 
 def start():
@@ -45,7 +46,8 @@ def start():
             SCENEGRAPH = scenegraph,
             WINDOW_RESOLUTION = avango.gua.Vec2ui(1400, 1050),
             SCREEN_DIMENSIONS = avango.gua.Vec2(1.135, 0.85),
-            SCREEN_MATRIX = avango.gua.make_trans_mat(-2.1, 0.96, 0.705) * avango.gua.make_rot_mat(90.0, 0, 1, 0) * avango.gua.make_rot_mat(90.0, -1, 0, 0),
+            SCREEN_MATRIX = avango.gua.make_trans_mat(-(0.525+1.61), 0.96, 0.72) * avango.gua.make_rot_mat(90.0, 0, 1, 0) * avango.gua.make_rot_mat(90.0, -1, 0, 0),
+            #SCREEN_MATRIX = avango.gua.make_trans_mat(-2.1, 0.96, 0.705) * avango.gua.make_rot_mat(90.0, 0, 1, 0) * avango.gua.make_rot_mat(90.0, -1, 0, 0),
             # TRACKING_TRANSMITTER_OFFSET = _tracking_transmitter_offset,
             LEFT_POSITION = avango.gua.Vec2ui(0, 0),
             LEFT_RESOLUTION = avango.gua.Vec2ui(1400, 1050),
@@ -61,10 +63,19 @@ def start():
             WARP_MATRIX_GREEN_LEFT = "/opt/3D43-warpmatrices/3D43_warp_P2.warp",
             WARP_MATRIX_BLUE_LEFT = "/opt/3D43-warpmatrices/3D43_warp_P3.warp",
             )
+     ## init navigation technique
+        keyboardInput = KeyboardInput()
+        keyboardInput.my_constructor("gua-device-keyboard1")
 
-        viewingSetup.init_user(HEADTRACKING_SENSOR_STATION = "tracking-dlp-glasses-1")
-        viewingSetup.init_user(HEADTRACKING_SENSOR_STATION = "tracking-dlp-glasses-2")
+        steeringNavigation = SteeringNavigation()
+        steeringNavigation.my_constructor(keyboardInput.mf_dof, keyboardInput.mf_buttons) # connect steering navigation with keyboard input
+
         viewingSetup.init_user(HEADTRACKING_SENSOR_STATION = "tracking-dlp-glasses-3")
+        viewingSetup.init_user(HEADTRACKING_SENSOR_STATION = "tracking-dlp-glasses-2")
+        viewingSetup.init_user(HEADTRACKING_SENSOR_STATION = "tracking-dlp-glasses-1")
+
+        manipulation_manager = ManipulationManager()
+        manipulation_manager.my_constructor(PARENT_NODE = viewingSetup.navigation_node, SCENE_ROOT = scenegraph.Root.value)
 
         # manipulationManager = ManipulationManager()
         # manipulationManager.my_constructor(
@@ -85,7 +96,7 @@ def start():
 
     print_graph(scenegraph.Root.value)
 
-    # leap = LeapSensor()
+    # leap = LeapSensor()LD_PRELOAD=./libLeap.so python3.5 Sample.py
     # leap.my_constructor(SCENE = scene, SCENEGRAPH = scenegraph, TRACKING_TRANSMITTER_OFFSET = _tracking_transmitter_offset)
 
     ## start application/render loop
