@@ -92,75 +92,58 @@ class LeapSensor(avango.script.Script):
         # self.index_sphere.Children.value.append(self.index_sphere_geometry)
         # self.leap_node.Children.value.append(self.index_sphere)
 
-        self.hands = [[], []]
+        self.righthand = [[], []]
+        self.lefthand = [[], []]
         # self.hands.append([])
         # self.hands.append([])
 
-        right_hand_color = avango.gua.Vec4(1.0, 0.0, 0.0, 1.0)
+        hand_color = avango.gua.Vec4(1.0, 0.0, 0.0, 1.0)
+        palm_color = avango.gua.Vec4(1.0, 0.0, 0.0, 0.5)
+
         self.rpalm_node = avango.gua.nodes.TransformNode(Name="right_palm_node")
         self.rpalm_geometry = _loader.create_geometry_from_file("right_palm_geometry", "data/objects/cube.obj", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.MAKE_PICKABLE)
-        self.rpalm_geometry.Material.value.set_uniform("Color", right_hand_color)
-        self.rpalm_geometry.Transform.value = avango.gua.make_scale_mat(0.06,0.01,0.10)
+        self.rpalm_geometry.Material.value.set_uniform("Color", palm_color)
+        self.rpalm_geometry.Transform.value = avango.gua.make_scale_mat(0.04,0.01,0.05)
         self.rpalm_node.Children.value.append(self.rpalm_geometry)
         self.leap_node.Children.value.append(self.rpalm_node)
+
         for f in range(5):
-            self.hands[0].append([])
-            for b in range(3):
+            self.righthand[0].append([])
+            for b in range(4):
                 length = 0.03
                 bone_node = avango.gua.nodes.TransformNode(Name="bone" + str(f) + "-" + str(b) + "_node")
-                if b == 0:
-                    if f == 0:
-                        bone_node.Transform.value = avango.gua.make_trans_mat(-0.045,0.0,0.03) #* avango.gua.make_rot_mat(90.0, 0.0, 1.0, 0.0)
-                    elif f == 1:
-                        bone_node.Transform.value = avango.gua.make_trans_mat(-0.03,0.0,-0.075-length/2*b)
-                    elif f == 2:
-                        bone_node.Transform.value = avango.gua.make_trans_mat(-0.01,0.0,-0.075-length/2*b)
-                    elif f == 3:
-                        bone_node.Transform.value = avango.gua.make_trans_mat(0.01,0.0,-0.075-length/2*b)
-                    elif f == 4:
-                        bone_node.Transform.value = avango.gua.make_trans_mat(0.03,0.0,-0.075-length/2*b)
-                else:
-                    if f == 0:
-                        bone_node.Transform.value = avango.gua.make_trans_mat(0.0,0.0,-length/2*b)
-                    elif f == 1:
-                        bone_node.Transform.value = avango.gua.make_trans_mat(0.0,0.0,-length/2*b)
-                    elif f == 2:
-                        bone_node.Transform.value = avango.gua.make_trans_mat(0.0,0.0,-length/2*b)
-                    elif f == 3:
-                        bone_node.Transform.value = avango.gua.make_trans_mat(0.0,0.0,-length/2*b)
-                    elif f == 4:
-                        bone_node.Transform.value = avango.gua.make_trans_mat(0.0,0.0,-length/2*b)
-
+               
                 bone_geometry = _loader.create_geometry_from_file("bone" + str(f) + "-" + str(b) + "_geometry", "data/objects/cube.obj", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.MAKE_PICKABLE)
-                bone_geometry.Material.value.set_uniform("Color", right_hand_color)
+                bone_geometry.Material.value.set_uniform("Color", hand_color)
                 bone_geometry.Transform.value = avango.gua.make_scale_mat(0.01,0.01,0.01) #* avango.gua.make_rot_mat(90.0,1.0,0.0,0.0) # todo: different length for bones
                 bone_node.Children.value.append(bone_geometry)
-                self.hands[0][f].append(bone_node)
-                if b == 0:
-                    self.rpalm_node.Children.value.append(bone_node)
-                else:
-                    self.hands[0][f][b-1].Children.value.append(bone_node)
+                self.righthand[0][f].append(bone_node)
+                
+                self.leap_node.Children.value.append(bone_node)
 
-        # print(self.hands)
+        left_hand_color = avango.gua.Vec4(1.0, 0.0, 0.0, 0.5)
+        self.lpalm_node = avango.gua.nodes.TransformNode(Name="left_palm_node")
+        self.lpalm_geometry = _loader.create_geometry_from_file("left_palm_geometry", "data/objects/cube.obj", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.MAKE_PICKABLE)
+        self.lpalm_geometry.Material.value.set_uniform("Color", palm_color)
+        self.lpalm_geometry.Transform.value = avango.gua.make_scale_mat(0.04,0.01,0.05)
+        self.lpalm_node.Children.value.append(self.lpalm_geometry)
+        self.leap_node.Children.value.append(self.lpalm_node)
+        for f in range(5):
+            self.lefthand[0].append([])
+            for b in range(4):
+                length = 0.03
+                bone_node = avango.gua.nodes.TransformNode(Name="bone" + str(f) + "-" + str(b) + "_node")
+               
+                bone_geometry = _loader.create_geometry_from_file("bone" + str(f) + "-" + str(b) + "_geometry", "data/objects/cube.obj", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.MAKE_PICKABLE)
+                bone_geometry.Material.value.set_uniform("Color", hand_color)
+                bone_geometry.Transform.value = avango.gua.make_scale_mat(0.01,0.01,0.01) #* avango.gua.make_rot_mat(90.0,1.0,0.0,0.0) # todo: different length for bones
+                bone_node.Children.value.append(bone_geometry)
+                self.lefthand[0][f].append(bone_node)
+                
+                self.leap_node.Children.value.append(bone_node)
 
 
-        # left_hand_color = avango.gua.Vec4(0.0, 0.0, 1.0, 1.0)
-        # self.lpalm_node = avango.gua.nodes.TransformNode(Name="left_palm_node")
-        # self.lpalm_geometry = _loader.create_geometry_from_file("left_palm_geometry", "data/objects/cube.obj", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.MAKE_PICKABLE)
-        # self.lpalm_geometry.Material.value.set_uniform("Color", left_hand_color)
-        # self.lpalm_geometry.Transform.value = avango.gua.make_scale_mat(0.06,0.01,0.10)
-        # self.lpalm_node.Children.value.append(self.lpalm_geometry)
-        # self.leap_node.Children.value.append(self.lpalm_node)
-        # for f in range(5):
-        #     self.hands[1].append([])
-        #     for b in range(3):
-        #         bone_node = avango.gua.nodes.TransformNode(Name="bone" + f + "-" + b + "_node")
-        #         bone_geometry = _loader.create_geometry_from_file("bone" + f + "-" + b + "_geometry", "data/objects/cube.obj", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.MAKE_PICKABLE)
-        #         bone_geometry.Material.value.set_uniform("Color", right_hand_color)
-        #         bone_geometry.Transform.value = avango.gua.make_scale_mat(0.01,0.01,0.03)
-        #         bone_node.Children.value.append(bone_geometry)
-        #         self.lpalm_node.Children.value.append(bone_node)
-        #         self.hands[1][f].append(bone_node)
+
 
 
         self.always_evaluate(True) # change global evaluation policy
@@ -184,16 +167,16 @@ class LeapSensor(avango.script.Script):
         self.rpalm_node.Transform.value = handright_pos * handright_rot
 
         ### left hand palm position and rotation
-        # self.hand_left = frame.hands.leftmost
-        # self.rot_x = math.degrees(self.hand_left.direction.pitch)
-        # self.rot_y = - math.degrees(self.hand_left.direction.yaw)
-        # self.rot_z = math.degrees(self.hand_left.palm_normal.roll)
-        # handleft_rot = avango.gua.make_rot_mat(self.rot_x, 1.0, 0.0, 0.0) *  avango.gua.make_rot_mat(self.rot_y, 0.0, 1.0, 0.0) * avango.gua.make_rot_mat(self.rot_z, 0.0, 0.0, 1.0)
-        # handleft_pos = self.get_leap_trans_mat(frame.hands.leftmost.palm_position)
-        # self.lpalm_node.Transform.value = handleft_pos * handleft_rot
+        self.hand_left = frame.hands.leftmost
+        self.rot_x = math.degrees(self.hand_left.direction.pitch)
+        self.rot_y = - math.degrees(self.hand_left.direction.yaw)
+        self.rot_z = math.degrees(self.hand_left.palm_normal.roll)
+        handleft_rot = avango.gua.make_rot_mat(self.rot_x, 1.0, 0.0, 0.0) *  avango.gua.make_rot_mat(self.rot_y, 0.0, 1.0, 0.0) * avango.gua.make_rot_mat(self.rot_z, 0.0, 0.0, 1.0)
+        handleft_pos = self.get_leap_trans_mat(frame.hands.leftmost.palm_position)
+        self.lpalm_node.Transform.value = handleft_pos * handleft_rot
 
         ### get right hand bones
-        for i, f in enumerate(self.hands[0]):
+        for i, f in enumerate(self.righthand[0]):
             finger = None
             if i == 0:
                 finger = frame.hands.rightmost.fingers.finger_type(Finger.TYPE_THUMB)[0]
@@ -210,7 +193,8 @@ class LeapSensor(avango.script.Script):
                 for j, b in enumerate(f):
                     bone = finger.bone(j)
                     length = bone.length
-                    bone_node = self.hands[0][i][j]
+                    bone_node = self.righthand[0][i][j]
+
 
                     # rot_x = math.degrees(bone.direction.pitch)
                     # rot_y = - math.degrees(bone.direction.yaw)
@@ -221,26 +205,7 @@ class LeapSensor(avango.script.Script):
                     # rot = avango.gua.make_rot_mat(rot_x, 1.0, 0.0, 0.0) *  avango.gua.make_rot_mat(rot_y, 0.0, 1.0, 0.0)
                     # _new_mat = avango.gua.make_trans_mat(trans) #* rot
                     _new_mat = trans
-                    # if j == 0:
-                    #     _new_mat = avango.gua.make_inverse_mat(bone_node.Parent.value.Transform.value) * \
-                    #         avango.gua.make_inverse_mat(bone_node.Parent.value.Parent.value.Transform.value) * \
-                    #         avango.gua.make_inverse_mat(bone_node.Parent.value.Parent.value.Parent.value.Transform.value) * \
-                    #          _new_mat
-                    # if j == 1:
-                    #     _new_mat = avango.gua.make_inverse_mat(bone_node.Parent.value.Transform.value) * \
-                    #         avango.gua.make_inverse_mat(bone_node.Parent.value.Parent.value.Transform.value) * \
-                    #         avango.gua.make_inverse_mat(bone_node.Parent.value.Parent.value.Parent.value.Transform.value) * \
-                    #         avango.gua.make_inverse_mat(bone_node.Parent.value.Parent.value.Parent.value.Parent.value.Transform.value) * \
-                    #          _new_mat
-                    # if j == 2:
-                    #     if bone.center.x != 0.0:
-                    #         print(str(bone.center.x), str(bone.center.y), str(bone.center.z))
-                    #     _new_mat = avango.gua.make_inverse_mat(bone_node.Parent.value.Transform.value) * \
-                    #         avango.gua.make_inverse_mat(bone_node.Parent.value.Parent.value.Transform.value) * \
-                    #         avango.gua.make_inverse_mat(bone_node.Parent.value.Parent.value.Parent.value.Transform.value) * \
-                    #         avango.gua.make_inverse_mat(bone_node.Parent.value.Parent.value.Parent.value.Parent.value.Transform.value) * \
-                    #         avango.gua.make_inverse_mat(bone_node.Parent.value.Parent.value.Parent.value.Parent.value.Parent.value.Transform.value) * \
-                    #          _new_mat
+                    
 
                     # bone_node.Transform.value = avango.gua.make_trans_mat(trans) * rot
                     bone_node.Transform.value = _new_mat
@@ -249,13 +214,37 @@ class LeapSensor(avango.script.Script):
                     #     print("bone", str(bone.center.x), str(bone.center.y), str(bone.center.z))
 
                     t = bone_node.Transform.value.get_translate()
-                    if t.x != 0.0:
-                        print("Transform", str(t.x), str(t.y), str(t.z))
+                    #if t.x != 0.0:
+                     #   print("Transform", str(t.x), str(t.y), str(t.z))
 
                     # t = bone_node.WorldTransform.value.get_translate()
                     # # if t.x != -2.0:
                     # print("World", str(t.x), str(t.y), str(t.z))
 
+        ### get left hand bones
+        for i, f in enumerate(self.lefthand[0]):
+            finger = None
+            if i == 0:
+                finger = frame.hands.leftmost.fingers.finger_type(Finger.TYPE_THUMB)[0]
+            elif i == 1:
+                finger = frame.hands.leftmost.fingers.finger_type(Finger.TYPE_INDEX)[0]
+            elif i == 2:
+                finger = frame.hands.leftmost.fingers.finger_type(Finger.TYPE_MIDDLE)[0]
+            elif i == 3:
+                finger = frame.hands.leftmost.fingers.finger_type(Finger.TYPE_RING)[0]
+            elif i == 4:
+                finger = frame.hands.leftmost.fingers.finger_type(Finger.TYPE_PINKY)[0]
+
+            if finger is not None:
+                for j, b in enumerate(f):
+                    bone = finger.bone(j)
+                    length = bone.length
+                    bone_node = self.lefthand[0][i][j]
+                    trans = self.get_leap_trans_mat(bone.center)
+                    _new_mat = trans 
+                    bone_node.Transform.value = _new_mat
+                    t = bone_node.Transform.value.get_translate()
+                 
 
         self.handright_pinch_strength = frame.hands.rightmost.pinch_strength
         self.handleft_pinch_strength = frame.hands.leftmost.pinch_strength

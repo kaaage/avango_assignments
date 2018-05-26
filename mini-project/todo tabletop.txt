@@ -1,0 +1,21 @@
+
+///////////// art tracking ///////////////
+
+1. start power for the switch
+2. turn on art controller
+
+medusa
+syncbox
+turn Tabletop
+
+
+cd /opt/client/dlp-tools
+1. ./medusa-fix.sh
+2. ./genlock_3_m6000.sh
+3. 2d white power switch (video multiplexers)
+
+start projectors:
+cd /opt/3D43-TCP_CTRL
+1. ./check-and-start_3D43.sh
+
+
