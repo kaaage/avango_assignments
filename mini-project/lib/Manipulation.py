@@ -57,8 +57,10 @@ class ManipulationManager(avango.script.Script):
 
         ## base node ##
         self.base_node = avango.gua.nodes.TransformNode(Name="base_node")
-        # self.base_node.Transform.value = avango.gua.make_trans_mat(-2.1, 0.96, 0.705) * avango.gua.make_rot_mat(90.0, 0, 1, 0) * \
-        #     avango.gua.make_rot_mat(90.0, 1, 0, 0) * avango.gua.make_rot_mat(90.0, -1, 0, 0)
+        
+        self.base_node.Transform.value = avango.gua.make_trans_mat(-2.1, 0.96, 0.705) * avango.gua.make_rot_mat(90.0, 0, 1, 0) * \
+             avango.gua.make_rot_mat(90.0, 1, 0, 0) * avango.gua.make_rot_mat(90.0, -1, 0, 0)
+        
         self.base_node.Transform.value = avango.gua.make_trans_mat(-2.1, 0.96, 0.705) * avango.gua.make_rot_mat(90.0, 0, 1, 0)
         PARENT_NODE.Children.value.append(self.base_node)
 
@@ -67,11 +69,11 @@ class ManipulationManager(avango.script.Script):
         _leap_transmitter_offset = avango.gua.make_trans_mat(-0.98, -(0.58 + 0.975), 0.27 + 3.48) * avango.gua.make_rot_mat(90.0,0,1,0) # transformation into tracking coordinate system 
 
         self.leap_tracking_sensor = avango.daemon.nodes.DeviceSensor(DeviceService = avango.daemon.DeviceService())
-        self.leap_tracking_sensor.Station.value = "tracking-dlp-glasses-1"
+        self.leap_tracking_sensor.Station.value = "tracking-dlp-leap"
         #self.leap_tracking_sensor.TransmitterOffset.value = _leap_transmitter_offset
 
         self.leap_position = avango.gua.nodes.TransformNode(Name = "leap_position")
-        self.leap_position.Transform.connect_from(self.leap_tracking_sensor  .Matrix)
+        self.leap_position.Transform.connect_from(self.leap_tracking_sensor.Matrix)
         self.leap_position.Tags.value = ["invisible"]
         PARENT_NODE.Children.value.append(self.leap_position)
 
@@ -88,7 +90,7 @@ class ManipulationManager(avango.script.Script):
         leap = LeapSensor()
         # either append leap to self.navigation_transform or to self.leap_position
         leap.my_constructor(SCENEGRAPH = self.SCENE_ROOT, BASENODE = self.leap_position, TARGET_LIST = self.cube_list)
-            
+    
         
 
         ## init inputs
@@ -98,6 +100,9 @@ class ManipulationManager(avango.script.Script):
         if SPACEMOUSE_TYPE == "Spacemouse":
             self.spacemouseInput = SpacemouseInput()
             self.spacemouseInput.my_constructor("gua-device-spacemouse")
+            # init field connections
+            self.mf_dof.connect_from(MF_DOF)
+            self.mf_buttons.connect_from(MF_BUTTONS)
 
         elif SPACEMOUSE_TYPE == "Blue Spacemouse":
             self.spacemouseInput = NewSpacemouseInput()
@@ -114,14 +119,17 @@ class ManipulationManager(avango.script.Script):
         self.sf_hand_mat.connect_from(self.ERCManipulation.sf_mat)
         self.sf_dragging_trigger.connect_from(self.ERCManipulation.sf_action_trigger)
         
+        ## init keyboard sensor for system control
+        self.keyboard_sensor = avango.daemon.nodes.DeviceSensor(DeviceService = avango.daemon.DeviceService())
+        self.keyboard_sensor.Station.value = "gua-device-keyboard0"
 
+      ### keyboard callback functions ###
 
-     
-
+    
     def evaluate(self): # evaluated every frame if any input field has changed (incl. dependency evaluation)
         _leap_pos = self.leap_tracking_sensor.Matrix.value.get_translate()
 
-        print (_leap_pos)
+        ##print (_leap_pos)
         ## print covered distance and hand velocity as debug output
         _distance = (self.sf_hand_mat.value.get_translate() - self.lf_hand_mat.get_translate()).length()
         _velocity = _distance * 60.0 # application loop runs with 60Hz
@@ -168,6 +176,13 @@ class Manipulation(avango.script.Script):
         if self.enable_flag == True:
             _left_button = self.mf_buttons.value[0]
             _right_button = self.mf_buttons.value[1]
+
+            if _left_button: 
+                print("lefty")
+                #TODO: reset to central leap positon + space mouse manipulation
+            if _right_button: 
+                print("righty")
+                #TODO: switch to move to physical leap positin mode + space mouse for y axis depth
 
             self.sf_action_trigger.value = _left_button ^ _right_button # button left XOR button right
 
@@ -234,3 +249,4 @@ class ElasticRateControlManipulation(Manipulation):
         self._y = 0.0
         self._z = 0.0
 
+  

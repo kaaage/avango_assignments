@@ -107,6 +107,9 @@ class LeapSensor(avango.script.Script):
         self.rpalm_node.Children.value.append(self.rpalm_geometry)
         self.leap_node.Children.value.append(self.rpalm_node)
 
+
+        #TODO: draw for physical hand position just the finger tips or the outline
+        #TODO: connect physical hand position visually with virtual hand position
         for f in range(5):
             self.righthand[0].append([])
             for b in range(4):
@@ -164,6 +167,7 @@ class LeapSensor(avango.script.Script):
         self.rot_z = math.degrees(self.hand_right.palm_normal.roll)
         handright_rot = avango.gua.make_rot_mat(self.rot_x, 1.0, 0.0, 0.0) *  avango.gua.make_rot_mat(self.rot_y, 0.0, 1.0, 0.0) * avango.gua.make_rot_mat(self.rot_z, 0.0, 0.0, 1.0)
         handright_pos = self.get_leap_trans_mat(frame.hands.rightmost.palm_position)
+        #TODO something is still wrong with the palm position transpation
         self.rpalm_node.Transform.value = handright_pos * handright_rot
 
         ### left hand palm position and rotation

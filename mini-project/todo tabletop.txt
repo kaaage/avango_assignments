@@ -31,6 +31,7 @@ ifconfig
 
 
 /////////////   glasses do not work?   ////////////////
+check if powercable from medusa and sync from syncbox goes to glasses sync (usb hub in the top middle of projector wall)
 cd /opt/shutterConfig$ 
 ./radioShutterControlTool 123_TouchTable.xml
 resend
@@ -42,3 +43,12 @@ cd /opt/projector-calib/examples/
 ./3D43_colorSlots.sh
 top
 killall slot
+
+
+///// How to train leap motion position /////////
+train the leap reflector configuration to the system with calibration body
+Use the leap avango demo and draw the palm position
+use calibration body manipulation to move adjust the coordinate system origin and axes
+with 'apply' the new position of the leap is applied during runtime
+do this incrementally to move the palm position to the correct origin
+(note: occlusion depth cues are stronger than the other depth cues!)
