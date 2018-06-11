@@ -6,16 +6,39 @@
 
 medusa
 syncbox
-turn Tabletop
+turn Tabletop on
 
 
 cd /opt/client/dlp-tools
-1. ./medusa-fix.sh
-2. ./genlock_3_m6000.sh
-3. 2d white power switch (video multiplexers)
+./medusa-fix.sh
+./genlock_3_m6000.sh
+
+
+2d white power switch (video multiplexers)
 
 start projectors:
 cd /opt/3D43-TCP_CTRL
-1. ./check-and-start_3D43.sh
+./check-and-start_3D43.sh
 
 
+http://medusa.medien.uni-weimar.de/
+load color tables
+
+///////////// projector does not start? ///////////////
+poweroff projector
+ifconfig
+./check-and-start_3D43.sh
+
+
+/////////////   glasses do not work?   ////////////////
+cd /opt/shutterConfig$ 
+./radioShutterControlTool 123_TouchTable.xml
+resend
+exit
+
+
+/////////////   check glasses configuration   ////////////////
+cd /opt/projector-calib/examples/
+./3D43_colorSlots.sh
+top
+killall slot
