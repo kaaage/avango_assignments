@@ -282,24 +282,24 @@ class LeapSensor(avango.script.Script):
         return transmat
 
 
-    # def start_dragging(self, NODE):
-    #     self.dragged_node = NODE        
-    #     # self.dragged_node.IsKinematic.value = False
-    #     self.dragging_offset_mat = avango.gua.make_inverse_mat(self.thumb_sphere.WorldTransform.value) * self.dragged_node.WorldTransform.value # object transformation in pointer coordinate system
+    def start_dragging(self, NODE):
+        self.dragged_node = NODE        
+        # self.dragged_node.IsKinematic.value = False
+        self.dragging_offset_mat = avango.gua.make_inverse_mat(self.thumb_sphere.WorldTransform.value) * self.dragged_node.WorldTransform.value # object transformation in pointer coordinate system
 
   
-    # def stop_dragging(self): 
-    #     # self.dragged_node.IsKinematic.value = True
-    #     self.dragged_node = None
-    #     self.dragging_offset_mat = avango.gua.make_identity_mat()
+    def stop_dragging(self): 
+        # self.dragged_node.IsKinematic.value = True
+        self.dragged_node = None
+        self.dragging_offset_mat = avango.gua.make_identity_mat()
 
 
-    # def dragging(self):
-    #     if self.dragged_node is not None: # object to drag
-    #         _new_mat = self.thumb_sphere.WorldTransform.value * self.dragging_offset_mat # new object position in world coodinates
-    #         _new_mat = avango.gua.make_inverse_mat(self.dragged_node.Parent.value.WorldTransform.value) * _new_mat # transform new object matrix from global to local space
+    def dragging(self):
+        if self.dragged_node is not None: # object to drag
+            _new_mat = self.thumb_sphere.WorldTransform.value * self.dragging_offset_mat # new object position in world coodinates
+            _new_mat = avango.gua.make_inverse_mat(self.dragged_node.Parent.value.WorldTransform.value) * _new_mat # transform new object matrix from global to local space
         
-    #         self.dragged_node.Transform.value = _new_mat
+            self.dragged_node.Transform.value = _new_mat
 
 
 class SampleListener(leap.Leap.Listener):

@@ -4,11 +4,12 @@
 1. start power for the switch
 2. turn on art controller
 
+////// power on //////
 medusa
 syncbox
 turn Tabletop on
 
-
+////// ssh into medusa //////
 cd /opt/client/dlp-tools
 ./medusa-fix.sh
 ./genlock_3_m6000.sh
@@ -29,6 +30,8 @@ poweroff projector
 ifconfig
 ./check-and-start_3D43.sh
 
+////// Network connected ? //////
+check ./xrandr_0-number.sh 2
 
 /////////////   glasses do not work?   ////////////////
 check if powercable from medusa and sync from syncbox goes to glasses sync (usb hub in the top middle of projector wall)
