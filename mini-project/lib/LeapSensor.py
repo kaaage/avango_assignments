@@ -54,6 +54,7 @@ class LeapSensor(avango.script.Script):
         self.BASENODE = BASENODE
         # self.SCENE = SCENE
         self.TARGET_LIST = TARGET_LIST
+        print("Target list len: " + str(len(self.TARGET_LIST)))
 
         ### Dragging 
         self.dragged_node = None
@@ -84,13 +85,13 @@ class LeapSensor(avango.script.Script):
         # self.thumb_sphere.Children.value.append(self.thumb_sphere_geometry)
         # self.leap_node.Children.value.append(self.thumb_sphere)
 
-        # self.index_sphere = avango.gua.nodes.TransformNode(Name="index_sphere")
+        self.index_sphere = avango.gua.nodes.TransformNode(Name="index_sphere")
         # self.index_sphere.Transform.value = self.handright_index_pos.value
-        # self.index_sphere_geometry = _loader.create_geometry_from_file("index_sphere", "data/objects/sphere.obj", avango.gua.LoaderFlags.DEFAULTS)
-        # self.index_sphere_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(1.0, 0.0, 0.0, 1.0))
-        # self.index_sphere_geometry.Transform.value = avango.gua.make_scale_mat(0.01,0.01,0.01)
-        # self.index_sphere.Children.value.append(self.index_sphere_geometry)
-        # self.leap_node.Children.value.append(self.index_sphere)
+        self.index_sphere_geometry = _loader.create_geometry_from_file("index_sphere", "data/objects/sphere.obj", avango.gua.LoaderFlags.DEFAULTS)
+        self.index_sphere_geometry.Material.value.set_uniform("Color", avango.gua.Vec4(1.0, 1.0, 1.0, 1.0))
+        self.index_sphere_geometry.Transform.value = avango.gua.make_scale_mat(0.001,0.001,0.001)
+        self.index_sphere.Children.value.append(self.index_sphere_geometry)
+        self.leap_node.Children.value.append(self.index_sphere)
 
         self.righthand = [[], []]
         self.lefthand = [[], []]
@@ -115,10 +116,14 @@ class LeapSensor(avango.script.Script):
             for b in range(4):
                 length = 0.03
                 bone_node = avango.gua.nodes.TransformNode(Name="bone" + str(f) + "-" + str(b) + "_node")
+
+                if f == 2 and b == 3:
+                    bone_node.Children.value.append(self.index_sphere)
                
                 bone_geometry = _loader.create_geometry_from_file("bone" + str(f) + "-" + str(b) + "_geometry", "data/objects/cube.obj", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.MAKE_PICKABLE)
                 bone_geometry.Material.value.set_uniform("Color", hand_color)
-                bone_geometry.Transform.value = avango.gua.make_scale_mat(0.01,0.01,0.01) #* avango.gua.make_rot_mat(90.0,1.0,0.0,0.0) # todo: different length for bones
+                # TODO: different length for bones from bone.length property
+                bone_geometry.Transform.value = avango.gua.make_scale_mat(0.01,0.01,0.02) #* avango.gua.make_rot_mat(90.0,1.0,0.0,0.0) 
                 bone_node.Children.value.append(bone_geometry)
                 self.righthand[0][f].append(bone_node)
                 
@@ -139,7 +144,8 @@ class LeapSensor(avango.script.Script):
                
                 bone_geometry = _loader.create_geometry_from_file("bone" + str(f) + "-" + str(b) + "_geometry", "data/objects/cube.obj", avango.gua.LoaderFlags.DEFAULTS | avango.gua.LoaderFlags.MAKE_PICKABLE)
                 bone_geometry.Material.value.set_uniform("Color", hand_color)
-                bone_geometry.Transform.value = avango.gua.make_scale_mat(0.01,0.01,0.01) #* avango.gua.make_rot_mat(90.0,1.0,0.0,0.0) # todo: different length for bones
+                # TODO: different length for bones from bone.length property
+                bone_geometry.Transform.value = avango.gua.make_scale_mat(0.01,0.01,0.02) #* avango.gua.make_rot_mat(90.0,1.0,0.0,0.0)
                 bone_node.Children.value.append(bone_geometry)
                 self.lefthand[0][f].append(bone_node)
                 
@@ -199,20 +205,29 @@ class LeapSensor(avango.script.Script):
                     length = bone.length
                     bone_node = self.righthand[0][i][j]
 
+                    bone_node.Children.value[0].Transform.value = avango.gua.make_scale_mat(0.01,0.01, length * 0.001)
 
-                    # rot_x = math.degrees(bone.direction.pitch)
-                    # rot_y = - math.degrees(bone.direction.yaw)
+                    rot_x = math.degrees(bone.direction.pitch)
+                    rot_y = - math.degrees(bone.direction.yaw)
+                    rot_z = math.degrees(bone.direction.roll)
 
+                    # only translation
+                    # trans = self.get_leap_trans_mat(bone.center)
+                    # _new_mat = trans
+
+                    # together with rotation
                     # trans = self.hands[0][i][j].Transform.value.get_translate()
-                    # trans = avango.gua.make_trans_mat(bone.center.x, bone.center.y, bone.center.x)
                     trans = self.get_leap_trans_mat(bone.center)
-                    # rot = avango.gua.make_rot_mat(rot_x, 1.0, 0.0, 0.0) *  avango.gua.make_rot_mat(rot_y, 0.0, 1.0, 0.0)
-                    # _new_mat = avango.gua.make_trans_mat(trans) #* rot
-                    _new_mat = trans
-                    
-
+                    # trans = avango.gua.make_trans_mat(bone.center.x, bone.center.y, bone.center.x)
+                    rot = avango.gua.make_rot_mat(rot_x, 1.0, 0.0, 0.0) * avango.gua.make_rot_mat(rot_y, 0.0, -1.0, 0.0) \
+                        * avango.gua.make_rot_mat(rot_z, 0.0, 0.0, 1.0)
+                    _new_mat = trans * rot
                     # bone_node.Transform.value = avango.gua.make_trans_mat(trans) * rot
                     bone_node.Transform.value = _new_mat
+                    
+                    # if bone.center.x != 0:
+                    #     print(rot)
+
 
                     # if bone.center.x != 0.0:
                     #     print("bone", str(bone.center.x), str(bone.center.y), str(bone.center.z))
@@ -222,8 +237,8 @@ class LeapSensor(avango.script.Script):
                      #   print("Transform", str(t.x), str(t.y), str(t.z))
 
                     # t = bone_node.WorldTransform.value.get_translate()
-                    # # if t.x != -2.0:
-                    # print("World", str(t.x), str(t.y), str(t.z))
+                    # if t.x != -2.0:
+                    #     print("World", str(t.x), str(t.y), str(t.z))
 
         ### get left hand bones
         for i, f in enumerate(self.lefthand[0]):
@@ -244,10 +259,24 @@ class LeapSensor(avango.script.Script):
                     bone = finger.bone(j)
                     length = bone.length
                     bone_node = self.lefthand[0][i][j]
+
+                    bone_node.Children.value[0].Transform.value = avango.gua.make_scale_mat(0.01,0.01, length * 0.001)
+
+                    # trans = self.get_leap_trans_mat(bone.center)
+                    # _new_mat = trans 
+                    # bone_node.Transform.value = _new_mat
+                    # t = bone_node.Transform.value.get_translate()
+
+                    rot_x = math.degrees(bone.direction.pitch)
+                    rot_y = - math.degrees(bone.direction.yaw)
+                    rot_z = math.degrees(bone.direction.roll)
+
+                    # together with rotation
                     trans = self.get_leap_trans_mat(bone.center)
-                    _new_mat = trans 
+                    rot = avango.gua.make_rot_mat(rot_x, 1.0, 0.0, 0.0) * avango.gua.make_rot_mat(rot_y, 0.0, -1.0, 0.0) \
+                        * avango.gua.make_rot_mat(rot_z, 0.0, 0.0, 1.0)
+                    _new_mat = trans * rot
                     bone_node.Transform.value = _new_mat
-                    t = bone_node.Transform.value.get_translate()
                  
 
         self.handright_pinch_strength = frame.hands.rightmost.pinch_strength
@@ -257,22 +286,24 @@ class LeapSensor(avango.script.Script):
         # self.thumb_sphere.Transform.value = self.handright_thumb_pos.value * avango.gua.make_rot_mat(self.leap_node.Transform.value.get_rotate_scale_corrected())
         # self.index_sphere.Transform.value = self.handright_index_pos.value
 
-        #check if to drag
-        # _pos = self.thumb_sphere.WorldTransform.value.get_translate() # world position of thumb_sphere
-        # for _node in self.TARGET_LIST: # iterate over all target nodes
-        #     _bb = _node.BoundingBox.value # get bounding box of a node
-        #     _rigid_body = _node.Parent.value.Parent.value
+        ## drag and drop
+        # check if to drag
+        _pos = self.index_sphere.WorldTransform.value.get_translate() # world position of thumb_sphere
+        for _node in self.TARGET_LIST: # iterate over all target nodes
+            print(_node)
+            _bb = _node.BoundingBox.value # get bounding box of a node
+            _rigid_body = _node.Parent.value.Parent.value
 
-        #     print(_rigid_body.IsKinematic.value)
+            # print(_rigid_body.IsKinematic.value)
 
-        #     if _bb.contains(_pos) == True: # hook inside bounding box of this node
-        #         _node.Material.value.set_uniform("Color", avango.gua.Vec4(0.0,1.0,0.0,0.85)) # highlight color
-        #         self.start_dragging(_rigid_body)
-        #     else:
-        #         _node.Material.value.set_uniform("Color", avango.gua.Vec4(1.0,0.0,0.0,1.0)) # default color
+            if _bb.contains(_pos) == True: # hook inside bounding box of this node
+                _node.Material.value.set_uniform("Color", avango.gua.Vec4(0.0,1.0,0.0,0.85)) # highlight color
+                self.start_dragging(_rigid_body)
+            else:
+                _node.Material.value.set_uniform("Color", avango.gua.Vec4(1.0,0.0,0.0,1.0)) # default color
 
-        # if self.handright_pinch_strength < self.pinch_threshold and self.dragged_node is not None:
-        #     self.stop_dragging()
+        if self.handright_pinch_strength < self.pinch_threshold and self.dragged_node is not None:
+            self.stop_dragging()
 
         # ## possibly update object dragging
         # self.dragging()

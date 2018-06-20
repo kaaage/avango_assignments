@@ -70,10 +70,11 @@ class ManipulationManager(avango.script.Script):
 
         self.leap_tracking_sensor = avango.daemon.nodes.DeviceSensor(DeviceService = avango.daemon.DeviceService())
         self.leap_tracking_sensor.Station.value = "tracking-dlp-leap"
-        #self.leap_tracking_sensor.TransmitterOffset.value = _leap_transmitter_offset
+        self.leap_tracking_sensor.TransmitterOffset.value = avango.gua.make_trans_mat(-0.35,-0.15,0.0)
 
         self.leap_position = avango.gua.nodes.TransformNode(Name = "leap_position")
         self.leap_position.Transform.connect_from(self.leap_tracking_sensor.Matrix)
+        # self.leap_position.Transform.value = avango.gua.make_trans_mat(0.0, -0.39, 0.0)
         self.leap_position.Tags.value = ["invisible"]
         PARENT_NODE.Children.value.append(self.leap_position)
 
@@ -89,7 +90,7 @@ class ManipulationManager(avango.script.Script):
         ### init leap sensor ###
         leap = LeapSensor()
         # either append leap to self.navigation_transform or to self.leap_position
-        leap.my_constructor(SCENEGRAPH = self.SCENE_ROOT, BASENODE = self.leap_position, TARGET_LIST = self.cube_list)
+        leap.my_constructor(SCENEGRAPH = self.SCENE_ROOT, BASENODE = self.leap_position, TARGET_LIST = TARGET_LIST)
     
         
 

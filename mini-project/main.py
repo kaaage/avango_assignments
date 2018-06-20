@@ -75,7 +75,7 @@ def start():
         viewingSetup.init_user(HEADTRACKING_SENSOR_STATION = "tracking-dlp-glasses-1")
 
         manipulation_manager = ManipulationManager()
-        manipulation_manager.my_constructor(PARENT_NODE = viewingSetup.navigation_node, SCENE_ROOT = scenegraph.Root.value)
+        manipulation_manager.my_constructor(PARENT_NODE = viewingSetup.navigation_node, SCENE_ROOT = scenegraph.Root.value, TARGET_LIST = scene.target_list)
 
         # manipulationManager = ManipulationManager()
         # manipulationManager.my_constructor(
