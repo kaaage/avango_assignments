@@ -109,19 +109,22 @@ class Scene:
             _rand_axis_y = random.randrange(0,100) * 0.01
             _rand_axis_z = random.randrange(0,100) * 0.01
                
-            _geometry = _loader.create_geometry_from_file("monkey" + str(_i), "data/objects/monkey.obj", avango.gua.LoaderFlags.DEFAULTS)
+            _geometry = _loader.create_geometry_from_file("cube" + str(_i), "data/objects/cube.obj", avango.gua.LoaderFlags.DEFAULTS)
+            _geometry.Material.value.set_uniform("ColorMap", "data/textures/box1/Mossy_A_albedo.tif")
+            _geometry.Material.value.set_uniform("NormalMap", "data/textures/box1/Mossy_A_normal.tif")
+
             _geometry.Transform.value = \
                 avango.gua.make_trans_mat(_rand_pos_x, -0.4, _rand_pos_z) * \
                 avango.gua.make_rot_mat(_rand_angle,_rand_axis_x,-0.4,_rand_axis_z) * \
-                avango.gua.make_scale_mat(0.022)
+                avango.gua.make_scale_mat(0.1)
 
             _geometry.add_field(avango.gua.SFMatrix4(), "DraggingOffsetMatrix")
-            _geometry.add_field(avango.gua.SFVec4(), "CurrentColor")
-            _geometry.CurrentColor.value = avango.gua.Vec4(1.0, 1.0, 1.0, 1.0)
-            _geometry.Material.value.set_uniform("Color", _geometry.CurrentColor.value)
+            #_geometry.add_field(avango.gua.SFVec4(), "CurrentColor")
+            #_geometry.CurrentColor.value = avango.gua.Vec4(1.0, 1.0, 1.0, 1.0)
+            #_geometry.Material.value.set_uniform("Color", _geometry.CurrentColor.value)
             self.base_node.Children.value.append(_geometry)
 
-            self.target_list.append(_geometry) # append monkey to target list
+            self.target_list.append(_geometry) # append the cubes to target list
 
         # self.cube_node_static = avango.gua.nodes.TransformNode(Name="cube_node_static")
         # self.cube_node_static.Transform.value = avango.gua.make_trans_mat(0.0, 0.0, 0.0) * avango.gua.make_scale_mat(0.05,0.05,0.05)

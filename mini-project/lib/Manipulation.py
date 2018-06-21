@@ -70,7 +70,7 @@ class ManipulationManager(avango.script.Script):
 
         self.leap_tracking_sensor = avango.daemon.nodes.DeviceSensor(DeviceService = avango.daemon.DeviceService())
         self.leap_tracking_sensor.Station.value = "tracking-dlp-leap"
-        self.leap_tracking_sensor.TransmitterOffset.value = avango.gua.make_trans_mat(-0.35,-0.15,0.0)
+        #self.leap_tracking_sensor.TransmitterOffset.value = avango.gua.make_trans_mat(-0.35,-0.15,0.0)
 
         self.leap_position = avango.gua.nodes.TransformNode(Name = "leap_position")
         self.leap_position.Transform.connect_from(self.leap_tracking_sensor.Matrix)
@@ -84,13 +84,13 @@ class ManipulationManager(avango.script.Script):
         self.navigation_transform.Transform.connect_from(self.sf_hand_mat)
         ## init Leap
         self.cube_list = []
-        self.base_node.Children.value.append(self.navigation_transform)
+        self.leap_position.Children.value.append(self.navigation_transform)
 
 
         ### init leap sensor ###
         leap = LeapSensor()
         # either append leap to self.navigation_transform or to self.leap_position
-        leap.my_constructor(SCENEGRAPH = self.SCENE_ROOT, BASENODE = self.leap_position, TARGET_LIST = TARGET_LIST)
+        leap.my_constructor(SCENEGRAPH = self.SCENE_ROOT, BASENODE = self.navigation_transform, TARGET_LIST = TARGET_LIST)
     
         
 
@@ -118,6 +118,7 @@ class ManipulationManager(avango.script.Script):
 
         # init field connections      
         self.sf_hand_mat.connect_from(self.ERCManipulation.sf_mat)
+        # TODO: Dragging not initialized by spacemouse button but by pinch
         self.sf_dragging_trigger.connect_from(self.ERCManipulation.sf_action_trigger)
         
         ## init keyboard sensor for system control
@@ -179,14 +180,11 @@ class Manipulation(avango.script.Script):
             _right_button = self.mf_buttons.value[1]
 
             if _left_button: 
-                print("lefty")
-                #TODO: reset to central leap positon + space mouse manipulation
+                print("Reset to real leap position")
+                self.reset()
             if _right_button: 
-                print("righty")
-                #TODO: switch to move to physical leap positin mode + space mouse for y axis depth
-
-            self.sf_action_trigger.value = _left_button ^ _right_button # button left XOR button right
-
+                print("Center")
+                self.center()
         
     ### functions ###
     def enable_manipulation(self, FLAG):   
@@ -205,12 +203,14 @@ class Manipulation(avango.script.Script):
     def reset(self):
         raise NotImplementedError("To be implemented by a subclass.")
     
+    def center(self):
+        raise NotImplementedError("To be implemented by a subclass.")
     
     def clamp_matrix(self, MATRIX):    
         # clamp translation to certain range (within screen space)
         _x_range = 0.5 # in meter
-        _y_range = 0.3 # in meter
-        _z_range = 0.3 # in meter    
+        _y_range = 0.5 # in meter
+        _z_range = 0.5 # in meter    
 
         MATRIX.set_element(0,3, min(_x_range, max(-_x_range, MATRIX.get_element(0,3)))) # clamp x-axis
         MATRIX.set_element(1,3, min(_y_range, max(-_y_range, MATRIX.get_element(1,3)))) # clamp y-axis
@@ -234,7 +234,7 @@ class ElasticRateControlManipulation(Manipulation):
     ## implement respective base-class function
     def manipulate(self):
         # #isomorphic
-        self._x += self.mf_dof.value[0] * 0.001
+        # self._x += self.mf_dof.value[0] * 0.001
         self._y += self.mf_dof.value[1] * 0.001
         self._z += self.mf_dof.value[2] * 0.001
         # accumulate input
@@ -250,4 +250,11 @@ class ElasticRateControlManipulation(Manipulation):
         self._y = 0.0
         self._z = 0.0
 
-  
+    def center(self):
+        # TODO: Calculate center position by inverse scenegraph
+        self._x = 0.0
+        self._y = -0.35
+        self._z = -0.35
+        _new_mat = avango.gua.make_trans_mat(self._x, self._y, self._z)
+        self.sf_mat.value = _new_mat # apply new matrix to field
+
