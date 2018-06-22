@@ -39,14 +39,13 @@ class ManipulationManager(avango.script.Script):
     # constructor
     def __init__(self):
         self.super(ManipulationManager).__init__()
-    
 
     def my_constructor(self,
         PARENT_NODE = None,
         SCENE_ROOT = None,
         TARGET_LIST = [],
         ):
-        
+
 
         ### external references ###        
         self.SCENE_ROOT = SCENE_ROOT
@@ -74,6 +73,7 @@ class ManipulationManager(avango.script.Script):
 
         self.leap_position = avango.gua.nodes.TransformNode(Name = "leap_position")
         self.leap_position.Transform.connect_from(self.leap_tracking_sensor.Matrix)
+
         # self.leap_position.Transform.value = avango.gua.make_trans_mat(0.0, -0.39, 0.0)
         self.leap_position.Tags.value = ["invisible"]
         PARENT_NODE.Children.value.append(self.leap_position)
@@ -82,6 +82,14 @@ class ManipulationManager(avango.script.Script):
         ### init leap navigation spacemouse  ###           
         self.navigation_transform = avango.gua.nodes.TransformNode(Name = "navigation_transform")
         self.navigation_transform.Transform.connect_from(self.sf_hand_mat)
+
+        ## put Leap 3D model into scene ###
+        _LeapModel = avango.gua.nodes.TriMeshLoader().create_geometry_from_file("LEAP", "data/objects/LeapModel.stl", avango.gua.LoaderFlags.DEFAULTS)
+        _LeapModel.Transform.value =  avango.gua.make_trans_mat(0.01, 0.054, 0.01) * \
+                avango.gua.make_rot_mat(-90,1,0.0,0.0) * \
+                avango.gua.make_scale_mat(0.55)
+        self.navigation_transform.Children.value.append(_LeapModel)
+
         ## init Leap
         self.cube_list = []
         self.leap_position.Children.value.append(self.navigation_transform)
@@ -151,9 +159,9 @@ class Manipulation(avango.script.Script):
     mf_buttons.value = [False,False] # init 2 channels
 
 
-    ### output_fields
+    ### Leap Start position
     sf_mat = avango.gua.SFMatrix4()
-    sf_mat.value = avango.gua.make_identity_mat()
+    sf_mat.value = avango.gua.make_trans_mat(0.0, -0.45, -0.45)
 
     sf_action_trigger = avango.SFBool()
     
@@ -180,11 +188,12 @@ class Manipulation(avango.script.Script):
             _right_button = self.mf_buttons.value[1]
 
             if _left_button: 
-                print("Reset to real leap position")
-                self.reset()
-            if _right_button: 
                 print("Center")
                 self.center()
+            if _right_button: 
+                print("Reset to real leap position")
+                self.reset()
+
         
     ### functions ###
     def enable_manipulation(self, FLAG):   
@@ -209,8 +218,8 @@ class Manipulation(avango.script.Script):
     def clamp_matrix(self, MATRIX):    
         # clamp translation to certain range (within screen space)
         _x_range = 0.5 # in meter
-        _y_range = 0.5 # in meter
-        _z_range = 0.5 # in meter    
+        _y_range = 0.8 # in meter
+        _z_range = 0.8 # in meter    
 
         MATRIX.set_element(0,3, min(_x_range, max(-_x_range, MATRIX.get_element(0,3)))) # clamp x-axis
         MATRIX.set_element(1,3, min(_y_range, max(-_y_range, MATRIX.get_element(1,3)))) # clamp y-axis
@@ -221,8 +230,8 @@ class Manipulation(avango.script.Script):
 class ElasticRateControlManipulation(Manipulation):
 
     _x = 0.0
-    _y = 0.0
-    _z = 0.0
+    _y = -0.45
+    _z = -0.45
     def my_constructor(self, MF_DOF, MF_BUTTONS):
         self.type = "elastic-rate-control"
       
@@ -234,7 +243,7 @@ class ElasticRateControlManipulation(Manipulation):
     ## implement respective base-class function
     def manipulate(self):
         # #isomorphic
-        # self._x += self.mf_dof.value[0] * 0.001
+        self._x += self.mf_dof.value[0] * 0.001
         self._y += self.mf_dof.value[1] * 0.001
         self._z += self.mf_dof.value[2] * 0.001
         # accumulate input
@@ -245,7 +254,7 @@ class ElasticRateControlManipulation(Manipulation):
 
     ## implement respective base-class function
     def reset(self):
-        self.sf_mat.value = avango.gua.make_identity_mat() # snap hand back to screen center
+        self.sf_mat.value = avango.gua.make_identity_mat() 
         self._x = 0.0
         self._y = 0.0
         self._z = 0.0
@@ -253,8 +262,8 @@ class ElasticRateControlManipulation(Manipulation):
     def center(self):
         # TODO: Calculate center position by inverse scenegraph
         self._x = 0.0
-        self._y = -0.35
-        self._z = -0.35
+        self._y = -0.45
+        self._z = -0.45
         _new_mat = avango.gua.make_trans_mat(self._x, self._y, self._z)
         self.sf_mat.value = _new_mat # apply new matrix to field
 
