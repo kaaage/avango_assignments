@@ -1,8 +1,7 @@
 
 ///////////// art tracking ///////////////
-
-1. start power for the switch
-2. turn on art controller
+start power for the switch
+turn on art controller
 
 ////// power on //////
 medusa
@@ -30,6 +29,10 @@ poweroff projector
 ifconfig
 ./check-and-start_3D43.sh
 
+////Medusa does not boot?////
+Disconnect all USB devices
+(leap & master)
+
 ////// Network connected ? //////
 check ./xrandr_0-number.sh 2
 
@@ -39,7 +42,6 @@ cd /opt/shutterConfig$
 ./radioShutterControlTool 123_TouchTable.xml
 resend
 exit
-
 
 /////////////   check glasses configuration   ////////////////
 cd /opt/projector-calib/examples/
@@ -55,3 +57,5 @@ use calibration body manipulation to move adjust the coordinate system origin an
 with 'apply' the new position of the leap is applied during runtime
 do this incrementally to move the palm position to the correct origin
 (note: occlusion depth cues are stronger than the other depth cues!)
+
+

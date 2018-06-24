@@ -167,6 +167,8 @@ class LeapSensor(avango.script.Script):
         # self.handleft_index_pos.value = self.get_leap_trans_mat(frame.hands.leftmost.fingers.finger_type(Finger.TYPE_INDEX)[0].tip_position)
         # self.handleft_thumb_pos.value = self.get_leap_trans_mat(frame.hands.leftmost.fingers.finger_type(Finger.TYPE_THUMB)[0].tip_position)
 
+        #TODO: Show hand.confidence 
+
         ### right hand palm position and rotation
         self.hand_right = frame.hands.rightmost
         self.rot_x = math.degrees(self.hand_right.direction.pitch)
@@ -211,23 +213,10 @@ class LeapSensor(avango.script.Script):
 
                     bone_node.Children.value[0].Transform.value = avango.gua.make_scale_mat(0.01,0.01, length * 0.001)
 
-                    rot_x = math.degrees(bone.direction.pitch)
-                    rot_y = - math.degrees(bone.direction.yaw)
-                    rot_z = math.degrees(bone.direction.roll)
-
-                    # only translation
-                    # trans = self.get_leap_trans_mat(bone.center)
-                    # _new_mat = trans
-
-                    # together with rotation
-                    # trans = self.hands[0][i][j].Transform.value.get_translate()
                     trans = self.get_leap_trans_mat(bone.center)
-                    # trans = avango.gua.make_trans_mat(bone.center.x, bone.center.y, bone.center.x)
-                    rot = avango.gua.make_rot_mat(rot_x, 1.0, 0.0, 0.0) * avango.gua.make_rot_mat(rot_y, 0.0, -1.0, 0.0) \
-                        * avango.gua.make_rot_mat(rot_z, 0.0, 0.0, 1.0)
-                    _new_mat = trans * rot
-                    # bone_node.Transform.value = avango.gua.make_trans_mat(trans) * rot
-                    bone_node.Transform.value = _new_mat
+                    rot = self.get_bone_rotation(bone)
+
+                    bone_node.Transform.value = trans * rot
                     
 
                     #TODO: Higlight finger when pinching
@@ -254,6 +243,8 @@ class LeapSensor(avango.script.Script):
 
         ### get left hand bones
         for i, f in enumerate(self.lefthand[0]):
+            #TODO: if there is one hand left hand and right hand get rendered at same position
+            #TODO: Hide all bones that are not tracked (no hand visible no bones in center)
             finger = None
             if i == 0:
                 finger = frame.hands.leftmost.fingers.finger_type(Finger.TYPE_THUMB)[0]
@@ -274,21 +265,11 @@ class LeapSensor(avango.script.Script):
 
                     bone_node.Children.value[0].Transform.value = avango.gua.make_scale_mat(0.01,0.01, length * 0.001)
 
-                    # trans = self.get_leap_trans_mat(bone.center)
-                    # _new_mat = trans 
-                    # bone_node.Transform.value = _new_mat
-                    # t = bone_node.Transform.value.get_translate()
-
-                    rot_x = math.degrees(bone.direction.pitch)
-                    rot_y = - math.degrees(bone.direction.yaw)
-                    rot_z = math.degrees(bone.direction.roll)
-
                     # together with rotation
                     trans = self.get_leap_trans_mat(bone.center)
-                    rot = avango.gua.make_rot_mat(rot_x, 1.0, 0.0, 0.0) * avango.gua.make_rot_mat(rot_y, 0.0, -1.0, 0.0) \
-                        * avango.gua.make_rot_mat(rot_z, 0.0, 0.0, 1.0)
-                    _new_mat = trans * rot
-                    bone_node.Transform.value = _new_mat
+                    rot = self.get_bone_rotation(bone)
+
+                    bone_node.Transform.value = trans * rot
                  
 
 
@@ -324,6 +305,19 @@ class LeapSensor(avango.script.Script):
         transmat = avango.gua.make_trans_mat(avango.gua.Vec3(pos.x / 1000, (pos.y / 1000), (pos.z / 1000)))
         return transmat
 
+    def get_bone_rotation(self, bone):
+        # can be used to get a 3x3 or 4x4 rotation matrix
+
+        local_rotation = bone.basis.rigid_inverse().to_array_4x4()
+        avango_mat = avango.gua.make_identity_mat()
+        for row in range(0, 4):
+            for col in range(0, 4):
+                pos = col + (4 * row)
+                avango_mat.set_element(row, col, local_rotation[pos])
+        #print (local_rotation)
+        #print (avango_mat)
+
+        return avango_mat
 
     def start_dragging(self, NODE):
         self.dragged_node = NODE        
