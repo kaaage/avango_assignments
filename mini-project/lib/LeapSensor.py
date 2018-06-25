@@ -29,6 +29,7 @@ class LeapSensor(avango.script.Script):
     handright_pinch_strength = 0
     handleft_pinch_strength = 0
 
+    handright_grab_strength = 0
     cube_picked = None
 
     def __init__(self):
@@ -151,9 +152,10 @@ class LeapSensor(avango.script.Script):
             handleft_pos = self.get_leap_trans_mat(self.hand_left.palm_position)
             self.lpalm_node.Transform.value = handleft_pos *  self.get_bone_rotation(self.hand_left)
 
-            self.handright_pinch_strength = frame.hands.rightmost.pinch_strength
-            self.handleft_pinch_strength = frame.hands.leftmost.pinch_strength
+            self.handright_pinch_strength = self.hand_right.pinch_strength
+            self.handleft_pinch_strength = self.hand_left.pinch_strength
 
+            self.hand_right.grab_strength
                 # #TODO: Show hand.confidence 
                 # print ("Right Hand | Left Hand")
                 # print (self.hand_right.confidence)
@@ -245,6 +247,7 @@ class LeapSensor(avango.script.Script):
 
                 if _bb.contains(_pos) == True: # hook inside bounding box of this node
                     _node.Material.value.set_uniform("Color", avango.gua.Vec4(0.0,1.0,0.0,1.0)) # highlight color
+                    # if self.handright_grab_strength > # TODO initialize scaling down of objects and delete if smaller than some threshold
                     if self.handright_pinch_strength > self.pinch_threshold:
                         self.start_dragging(_node)
                 else:
@@ -295,7 +298,10 @@ class LeapSensor(avango.script.Script):
             self.dragged_node.Transform.value = _local_mat
             print(self.dragged_node.Transform.value)
     
-    def start_scaling(self, NODE): # add two handed scaling functionality
+    def start_scaling(self, NODE): 
+    #TODO: add two handed scaling functionality
+    #This all can be used to calculate distance between two positions
+    #This distance is used than as the scaling factor
         self.eye_to_object = self.hit_position * avango.osg.make_inverse_mat(self.HeadTransform.value)
         self.object_distance = self.eye_to_object.length()
         self.eye_to_object_normalized = self.eye_to_object / self.object_distance
