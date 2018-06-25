@@ -38,7 +38,7 @@ check ./xrandr_0-number.sh 2
 
 /////////////   glasses do not work?   ////////////////
 check if powercable from medusa and sync from syncbox goes to glasses sync (usb hub in the top middle of projector wall)
-cd /opt/shutterConfig$ 
+cd /opt/shutterConfig
 ./radioShutterControlTool 123_TouchTable.xml
 resend
 exit

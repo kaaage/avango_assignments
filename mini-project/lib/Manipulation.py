@@ -33,7 +33,6 @@ class ManipulationManager(avango.script.Script):
     sf_key_6 = avango.SFBool()            
 
     sf_hand_mat = avango.gua.SFMatrix4()
-    sf_dragging_trigger = avango.SFBool()
 
 
     # constructor
@@ -50,10 +49,6 @@ class ManipulationManager(avango.script.Script):
         ### external references ###        
         self.SCENE_ROOT = SCENE_ROOT
 
-
-        ### variables ###
-        self.lf_hand_mat = avango.gua.make_identity_mat() # last frame hand matrix
-
         ## base node ##
         self.base_node = avango.gua.nodes.TransformNode(Name="base_node")
         
@@ -69,13 +64,12 @@ class ManipulationManager(avango.script.Script):
 
         self.leap_tracking_sensor = avango.daemon.nodes.DeviceSensor(DeviceService = avango.daemon.DeviceService())
         self.leap_tracking_sensor.Station.value = "tracking-dlp-leap"
-        #self.leap_tracking_sensor.TransmitterOffset.value = avango.gua.make_trans_mat(-0.35,-0.15,0.0)
 
         self.leap_position = avango.gua.nodes.TransformNode(Name = "leap_position")
         self.leap_position.Transform.connect_from(self.leap_tracking_sensor.Matrix)
 
         # self.leap_position.Transform.value = avango.gua.make_trans_mat(0.0, -0.39, 0.0)
-        self.leap_position.Tags.value = ["invisible"]
+        #self.leap_position.Tags.value = ["invisible"]
         PARENT_NODE.Children.value.append(self.leap_position)
 
 
@@ -126,28 +120,11 @@ class ManipulationManager(avango.script.Script):
 
         # init field connections      
         self.sf_hand_mat.connect_from(self.ERCManipulation.sf_mat)
-        # TODO: Dragging not initialized by spacemouse button but by pinch
-        self.sf_dragging_trigger.connect_from(self.ERCManipulation.sf_action_trigger)
-        
-        ## init keyboard sensor for system control
-        self.keyboard_sensor = avango.daemon.nodes.DeviceSensor(DeviceService = avango.daemon.DeviceService())
-        self.keyboard_sensor.Station.value = "gua-device-keyboard0"
-
-      ### keyboard callback functions ###
+        #self.sf_hand_mat.value = avango.gua.make_trans_mat(0.0, -0.45, -0.45)
 
     
     def evaluate(self): # evaluated every frame if any input field has changed (incl. dependency evaluation)
         _leap_pos = self.leap_tracking_sensor.Matrix.value.get_translate()
-
-        ##print (_leap_pos)
-        ## print covered distance and hand velocity as debug output
-        _distance = (self.sf_hand_mat.value.get_translate() - self.lf_hand_mat.get_translate()).length()
-        _velocity = _distance * 60.0 # application loop runs with 60Hz
-        self.lf_hand_mat = self.sf_hand_mat.value
-        
-        #print(round(_distance, 3), "m/frame  ", round(_velocity, 2), "m/s")
-
-
 
 class Manipulation(avango.script.Script):
 
@@ -172,7 +149,7 @@ class Manipulation(avango.script.Script):
 
         ### variables ###
         self.type = ""
-        self.enable_flag = False
+        self.enable_flag = False # TODO: Remove the useless Manipulation classes
 
     
     ### callback functions ###
@@ -217,9 +194,9 @@ class Manipulation(avango.script.Script):
     
     def clamp_matrix(self, MATRIX):    
         # clamp translation to certain range (within screen space)
-        _x_range = 0.5 # in meter
+        _x_range = 0.8 # in meter
         _y_range = 0.8 # in meter
-        _z_range = 0.8 # in meter    
+        _z_range = 1.6 # in meter    
 
         MATRIX.set_element(0,3, min(_x_range, max(-_x_range, MATRIX.get_element(0,3)))) # clamp x-axis
         MATRIX.set_element(1,3, min(_y_range, max(-_y_range, MATRIX.get_element(1,3)))) # clamp y-axis
@@ -234,7 +211,8 @@ class ElasticRateControlManipulation(Manipulation):
     _z = -0.45
     def my_constructor(self, MF_DOF, MF_BUTTONS):
         self.type = "elastic-rate-control"
-      
+        #self.sf_mat.value = avango.gua.make_trans_mat(0.0, -0.45, -0.45) #TODO: i do not know how and where to set the initial leap position to center
+
         # init field connections
         self.mf_dof.connect_from(MF_DOF)
         self.mf_buttons.connect_from(MF_BUTTONS)
