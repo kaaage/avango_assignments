@@ -266,9 +266,9 @@ class LeapSensor(avango.script.Script):
                 if _bb.contains(_handright_pos) == True and self.hand_right.grab_strength >= 0.7:
                     _node.Material.value.set_uniform("Color", avango.gua.Vec4(1.0,0.0,0.0,1.0)) # highlight color
 
-                    # if self.hand_right.grab_strength > 0.9:
-                    #     _node.Transform.value = avango.gua.make_scale_mat(0.0)
-                    #     self.stop_dragging()
+                    if self.hand_right.grab_strength > 0.9:
+                        _node.Transform.value = avango.gua.make_scale_mat(0.0)
+                        self.stop_dragging()
 
 
 
@@ -332,13 +332,13 @@ class LeapSensor(avango.script.Script):
         # distance = left.distance_to(right)
         # print(distance)
 
-        factor = 1 - self.prev_pinch - pinch_strength
+        factor = self.prev_pinch - pinch_strength
         print(factor)
 
         trans_mat = avango.gua.make_trans_mat(NODE.Transform.value.get_translate())
         rot_mat = avango.gua.make_rot_mat(NODE.Transform.value.get_rotate_scale_corrected())
-        _new_scale = NODE.Transform.value.get_scale().x * (1.0 + factor * 0.01)
-        _new_scale = min(max(_new_scale, 0.05),0.3)
+        _new_scale = NODE.Transform.value.get_scale().x * (1.0 + factor)
+        _new_scale = min(max(_new_scale, 0.05),0.5)
         scale_mat = avango.gua.make_scale_mat(_new_scale)
 
         NODE.Transform.value = trans_mat * rot_mat * scale_mat
