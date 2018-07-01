@@ -50,8 +50,10 @@ class LeapSensor(avango.script.Script):
         print("Target list len: " + str(len(self.TARGET_LIST)))
 
         ### Dragging 
+        self.dragging_mode = False
         self.dragged_node = None
         self.dragging_offset_mat = avango.gua.make_identity_mat()
+        self.prev_pinch = 0.0
 
         ### Init Leap Motion ###
         # Create a sample listener and controller
@@ -71,6 +73,7 @@ class LeapSensor(avango.script.Script):
         
 
         self.index_tip = avango.gua.nodes.TransformNode(Name="index_tip")
+        self.left_index_tip = avango.gua.nodes.TransformNode(Name="index_tip")
 
 
         self.righthand = [[], []]
@@ -237,31 +240,47 @@ class LeapSensor(avango.script.Script):
 
             ## drag and drop
             # check if to drag
-            _pos = self.index_tip.WorldTransform.value.get_translate() # world position of thumb_sphere
+            self.dragging()
+
+            _index_pos = self.index_tip.WorldTransform.value.get_translate() # world position of thumb_sphere
+            _left_index_pos = self.left_index_tip.WorldTransform.value.get_translate()
+            _handright_pos = self.rpalm_geometry.WorldTransform.value.get_translate()
+
             for _node in self.TARGET_LIST: # iterate over all target nodes
                 _bb = _node.BoundingBox.value # get bounding box of a node
-                _transform = _node.Parent.value
+                # _transform = _node.Parent.value
 
                 # print(_rigid_body.IsKinematic.value) #TODO: We wanted to have physics :'(
 
-
-                if _bb.contains(_pos) == True: # hook inside bounding box of this node
+                if _bb.contains(_index_pos) == True and _bb.contains(_left_index_pos) == False: # hook inside bounding box of this node
                     _node.Material.value.set_uniform("Color", avango.gua.Vec4(0.0,1.0,0.0,1.0)) # highlight color
                     # if self.handright_grab_strength > # TODO initialize scaling down of objects and delete if smaller than some threshold
-                    if self.handright_pinch_strength > self.pinch_threshold:
-                        self.start_dragging(_node)
-                else:
+
+                    if self.dragging_mode == False:
+                        if self.handright_pinch_strength > self.pinch_threshold:
+                        # if self.dragging_mode == True:
+                            self.start_dragging(_node)
+                    elif self.dragging_mode == True:
+                        self.start_scaling(_node, self.handright_pinch_strength)
+
+                if _bb.contains(_handright_pos) == True and self.hand_right.grab_strength >= 0.7:
+                    _node.Material.value.set_uniform("Color", avango.gua.Vec4(1.0,0.0,0.0,1.0)) # highlight color
+
+                    # if self.hand_right.grab_strength > 0.9:
+                    #     _node.Transform.value = avango.gua.make_scale_mat(0.0)
+                    #     self.stop_dragging()
+
+
+
+                if _bb.contains(_index_pos) == False and _bb.contains(_handright_pos) == False:
                     _node.Material.value.set_uniform("Color", avango.gua.Vec4(1.0,1.0,1.0,1.0)) # default color
+
 
             if self.handright_pinch_strength < self.pinch_threshold and self.dragged_node is not None:
                 self.stop_dragging()
 
-            ## possibly update object dragging
-            self.dragging()
-
         else:
             self.leap_node.Transform.value = avango.gua.make_trans_mat(0.0, -2.0, 0.0) # hide undefined leap bones
-
 
     def get_leap_trans_mat(self, pos):
         transmat = avango.gua.make_trans_mat(avango.gua.Vec3(pos.x / 1000, (pos.y / 1000), (pos.z / 1000)))
@@ -281,30 +300,50 @@ class LeapSensor(avango.script.Script):
         self.dragged_node = NODE        
         # self.dragged_node.IsKinematic.value = False
         self.dragging_offset_mat = avango.gua.make_inverse_mat(self.index_tip.WorldTransform.value) * self.dragged_node.WorldTransform.value # object transformation in pointer coordinate system
-        print("Start dragging")
+        # print("Start dragging")
 
     def stop_dragging(self): 
         # self.dragged_node.IsKinematic.value = True
         self.dragged_node = None
         self.dragging_offset_mat = avango.gua.make_identity_mat()
-        print("Stopped dragging")
+        # print("Stopped dragging")
 
     def dragging(self):
-        # TODO: The cube gets only dragged at the border?
         if self.dragged_node is not None: # object to drag
             _world_mat = self.index_tip.WorldTransform.value * self.dragging_offset_mat # new object position in world coodinates
+            # _scale_node = _node.Parent.value
+            # _trans_node = _scale_node.Parent.value
+            # _parent = _trans_node.Parent.value
             _local_mat = avango.gua.make_inverse_mat(self.dragged_node.Parent.value.WorldTransform.value) * _world_mat # transform new object matrix from global to local space
+            # _local_mat = avango.gua.make_inverse_mat(_parent) * avango.gua.make_inverse_mat(_trans_node) * avango.gua.make_inverse_mat(_scale_node) * _world_mat # transform new object matrix from global to local space
         
             self.dragged_node.Transform.value = _local_mat
-            print(self.dragged_node.Transform.value)
     
-    def start_scaling(self, NODE): 
-    #TODO: add two handed scaling functionality
-    #This all can be used to calculate distance between two positions
-    #This distance is used than as the scaling factor
-        self.eye_to_object = self.hit_position * avango.osg.make_inverse_mat(self.HeadTransform.value)
-        self.object_distance = self.eye_to_object.length()
-        self.eye_to_object_normalized = self.eye_to_object / self.object_distance
+    def start_scaling(self, NODE, pinch_strength): 
+        #TODO: add two handed scaling functionality
+        #This all can be used to calculate distance between two positions
+        #This distance is used than as the scaling factor
+        # self.eye_to_object = self.hit_position * avango.osg.make_inverse_mat(self.HeadTransform.value)
+        # self.object_distance = self.eye_to_object.length()
+        # self.eye_to_object_normalized = self.eye_to_object / self.object_distance
+
+        # right = self.hand_right.fingers.finger_type(Finger.TYPE_INDEX)[0].bone(3)
+        # left = self.hand_leftt.fingers.finger_type(Finger.TYPE_INDEX)[0].bone(3)
+        # distance = left.distance_to(right)
+        # print(distance)
+
+        factor = 1 - self.prev_pinch - pinch_strength
+        print(factor)
+
+        trans_mat = avango.gua.make_trans_mat(NODE.Transform.value.get_translate())
+        rot_mat = avango.gua.make_rot_mat(NODE.Transform.value.get_rotate_scale_corrected())
+        _new_scale = NODE.Transform.value.get_scale().x * (1.0 + factor * 0.01)
+        _new_scale = min(max(_new_scale, 0.05),0.3)
+        scale_mat = avango.gua.make_scale_mat(_new_scale)
+
+        NODE.Transform.value = trans_mat * rot_mat * scale_mat
+
+        self.prev_pinch = pinch_strength
 
 class SampleListener(leap.Leap.Listener):
     def on_init(self, controller):

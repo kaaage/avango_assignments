@@ -114,7 +114,7 @@ class ManipulationManager(avango.script.Script):
 
         #done
         self.ERCManipulation = ElasticRateControlManipulation()
-        self.ERCManipulation.my_constructor(self.spacemouseInput.mf_dof, self.spacemouseInput.mf_buttons)
+        self.ERCManipulation.my_constructor(self.spacemouseInput.mf_dof, self.spacemouseInput.mf_buttons, LEAP = leap)
         
         self.ERCManipulation.enable_manipulation(True)
 
@@ -141,7 +141,6 @@ class Manipulation(avango.script.Script):
     sf_mat.value = avango.gua.make_trans_mat(0.0, -0.45, -0.45)
 
     sf_action_trigger = avango.SFBool()
-    
 
     ### constructor
     def __init__(self):
@@ -150,6 +149,8 @@ class Manipulation(avango.script.Script):
         ### variables ###
         self.type = ""
         self.enable_flag = False # TODO: Remove the useless Manipulation classes
+
+        self.in_center = False
 
     
     ### callback functions ###
@@ -165,11 +166,14 @@ class Manipulation(avango.script.Script):
             _right_button = self.mf_buttons.value[1]
 
             if _left_button: 
-                print("Center")
-                self.center()
+                # print("Trigger dragging mode")
+                self.trigger_dragging()
             if _right_button: 
                 print("Reset to real leap position")
-                self.reset()
+                if self.in_center == False:
+                    self.center()
+                else:
+                    self.reset()
 
         
     ### functions ###
@@ -209,13 +213,15 @@ class ElasticRateControlManipulation(Manipulation):
     _x = 0.0
     _y = -0.45
     _z = -0.45
-    def my_constructor(self, MF_DOF, MF_BUTTONS):
+    def my_constructor(self, MF_DOF, MF_BUTTONS, LEAP):
         self.type = "elastic-rate-control"
         #self.sf_mat.value = avango.gua.make_trans_mat(0.0, -0.45, -0.45) #TODO: i do not know how and where to set the initial leap position to center
 
         # init field connections
         self.mf_dof.connect_from(MF_DOF)
         self.mf_buttons.connect_from(MF_BUTTONS)
+
+        self.leap = LEAP
 
 
     ## implement respective base-class function
@@ -232,6 +238,7 @@ class ElasticRateControlManipulation(Manipulation):
 
     ## implement respective base-class function
     def reset(self):
+        self.in_center = False
         self.sf_mat.value = avango.gua.make_identity_mat() 
         self._x = 0.0
         self._y = 0.0
@@ -239,9 +246,12 @@ class ElasticRateControlManipulation(Manipulation):
 
     def center(self):
         # TODO: Calculate center position by inverse scenegraph
+        self.in_center = True
         self._x = 0.0
         self._y = -0.45
         self._z = -0.45
         _new_mat = avango.gua.make_trans_mat(self._x, self._y, self._z)
         self.sf_mat.value = _new_mat # apply new matrix to field
 
+    def trigger_dragging(self):
+        self.leap.dragging_mode = True if self.leap.dragging_mode == False else False

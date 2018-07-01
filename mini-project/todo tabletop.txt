@@ -20,6 +20,8 @@ start projectors:
 cd /opt/3D43-TCP_CTRL
 ./check-and-start_3D43.sh
 
+(run: 'sudo ifconfig eno1 192.168.1.1 netmask 255.255.255.0')
+
 
 http://medusa.medien.uni-weimar.de/
 load color tables

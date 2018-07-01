@@ -119,10 +119,25 @@ class Scene:
                 avango.gua.make_scale_mat(0.1)
 
             _geometry.add_field(avango.gua.SFMatrix4(), "DraggingOffsetMatrix")
+
+            self.base_node.Children.value.append(_geometry)
+
             #_geometry.add_field(avango.gua.SFVec4(), "CurrentColor")
             #_geometry.CurrentColor.value = avango.gua.Vec4(1.0, 1.0, 1.0, 1.0)
             #_geometry.Material.value.set_uniform("Color", _geometry.CurrentColor.value)
-            self.base_node.Children.value.append(_geometry)
+
+            # _trans_node = avango.gua.nodes.TransformNode(Name="trans_node")
+            # _trans_node.Transform.value = avango.gua.make_scale_mat(0.1)
+            # _trans_node.Children.value.append(_scale_node)
+            # _trans_node.Transform.value = \
+            #     avango.gua.make_trans_mat(_rand_pos_x, -0.4, _rand_pos_z) * \
+            #     avango.gua.make_rot_mat(_rand_angle,_rand_axis_x,-0.4,_rand_axis_z)
+            # self.base_node.Children.value.append(_trans_node)
+
+            # _scale_node = avango.gua.nodes.TransformNode(Name="scale_node")
+            # _scale_node.Transform.value = avango.gua.make_scale_mat(0.1)
+            # _scale_node.Children.value.append(_geometry)
+            # _trans_node.Children.value.append(_scale_node)
 
             self.target_list.append(_geometry) # append the cubes to target list
 
